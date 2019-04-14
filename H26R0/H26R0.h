@@ -2,25 +2,25 @@
     BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
     All rights reserved
 		
-    File Name     : H1DR1.h
-    Description   : Header file for module H1DR1.
-										RS-485 Serial Transceiver (MAX14840EASA+)
+    File Name     : H26R0.h
+    Description   : Header file for module H26R0.
+										Load cell (strain gauge) Whatstone bridge sensor (HX711)
 */
 	
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef H1DR1_H
-#define H1DR1_H
+#ifndef H26R0_H
+#define H26R0_H
 
 /* Includes ------------------------------------------------------------------*/
 #include "BOS.h"
-#include "H1DR1_uart.h"	
-#include "H1DR1_gpio.h"	
-#include "H1DR1_dma.h"	
+#include "H26R0_uart.h"	
+#include "H26R0_gpio.h"	
+#include "H26R0_dma.h"	
 	
 	
 /* Exported definitions -------------------------------------------------------*/
 
-#define	modulePN		_H1DR1
+#define	modulePN		_H26R0
 
 /* Port-related definitions */
 #define	NumOfPorts		5
@@ -31,11 +31,9 @@
 #define _P2 
 #define _P3
 #define _P4 
-#define _P5 
-#define _P6 
+#define _P5  
 
 /* Define available USARTs */
-#define _Usart1 1
 #define _Usart2 1
 #define _Usart3 1
 #define _Usart4 1
@@ -43,21 +41,13 @@
 #define _Usart6	1
 
 /* Port-UART mapping */
-#define P1uart 			&huart5
+#define P1uart 			&huart4
 #define P2uart 			&huart2	
 #define P3uart 			&huart6
 #define P4uart 			&huart3
-#define P5uart 			&huart1	
-#define P6uart 			&huart4	
-#define P_RS485uart 		P6uart
+#define P5uart 			&huart5	
 
 /* Port Definitions */
-#define	USART1_TX_PIN		GPIO_PIN_9
-#define	USART1_RX_PIN		GPIO_PIN_10
-#define	USART1_TX_PORT	GPIOA
-#define	USART1_RX_PORT	GPIOA
-#define	USART1_AF				GPIO_AF1_USART1
-
 #define	USART2_TX_PIN		GPIO_PIN_2
 #define	USART2_RX_PIN		GPIO_PIN_3
 #define	USART2_TX_PORT	GPIOA
@@ -89,36 +79,19 @@
 #define	USART6_AF				GPIO_AF5_USART6
 
 /* Module-specific Definitions */
-#ifdef H1DR1
-	#define _P_RS485 		_P6
-	#define P_RS485 		P6
-	#define	RS485_RE_PIN		GPIO_PIN_7
-	#define	RS485_DE_PIN		GPIO_PIN_0
-	#define	RS485_RE_PORT		GPIOA
-	#define	RS485_DE_PORT		GPIOB
-	// \RE = 1, DE = 0 Low power shutdown mode
-	#define	RS485_SHUTDOWN()		HAL_GPIO_WritePin(RS485_RE_PORT, RS485_RE_PIN, GPIO_PIN_SET); HAL_GPIO_WritePin(RS485_DE_PORT, RS485_DE_PIN, GPIO_PIN_RESET)
-	// \RE = 0 Enable receiver output
-	#define	RS485_RECEIVER_EN()		HAL_GPIO_WritePin(RS485_RE_PORT, RS485_RE_PIN, GPIO_PIN_RESET)
-	// DE = 1 Enable driver output
-	#define	RS485_DRIVER_EN()		HAL_GPIO_WritePin(RS485_DE_PORT, RS485_DE_PIN, GPIO_PIN_SET)
-	// \RE = 1 Disable receiver output
-	#define	RS485_RECEIVER_DIS()		HAL_GPIO_WritePin(RS485_RE_PORT, RS485_RE_PIN, GPIO_PIN_SET)
-	// DE = 0 Disable driver output
-	#define	RS485_DRIVER_DIS()		HAL_GPIO_WritePin(RS485_DE_PORT, RS485_DE_PIN, GPIO_PIN_RESET)
-#endif
+
 
 /* H01R0_Status Type Definition */  
 typedef enum 
 {
-  H1DR1_OK = 0,
-	H1DR1_ERR_UnknownMessage = 1,
-	H1DR1_ERROR = 255
+  H26R0_OK = 0,
+	H26R0_ERR_UnknownMessage = 1,
+	H26R0_ERROR = 255
 } Module_Status;
 
 /* Indicator LED */
-#define _IND_LED_PORT		GPIOB
-#define _IND_LED_PIN		GPIO_PIN_14
+#define _IND_LED_PORT		GPIOA
+#define _IND_LED_PIN		GPIO_PIN_11
 
 
 /* Export UART variables */
@@ -130,7 +103,6 @@ extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart6;
 
 /* Define UART Init prototypes */
-extern void MX_USART1_UART_Init(void);
 extern void MX_USART2_UART_Init(void);
 extern void MX_USART3_UART_Init(void);
 extern void MX_USART4_UART_Init(void);
@@ -162,6 +134,6 @@ extern void MX_USART6_UART_Init(void);
 
 
 
-#endif /* H1DR1_H */
+#endif /* H26R0_H */
 
 /************************ (C) COPYRIGHT HEXABITZ *****END OF FILE****/

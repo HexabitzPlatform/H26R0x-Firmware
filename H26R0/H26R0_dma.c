@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * File Name          : H1DR1_DMA.c
+  * File Name          : H26R0_DMA.c
   * Description        : This file provides code for the configuration
   *                      of the DMA instances.
   ******************************************************************************

@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * File Name          : H1DR1_gpio.h
+  * File Name          : H26R0_gpio.h
   * Description        : This file contains all the functions prototypes for 
   *                      the gpio  
   ******************************************************************************
@@ -50,7 +50,6 @@
 
 extern void MX_GPIO_Init(void);
 extern void IND_LED_Init(void);
-extern void RS485_DE_RE_Init(void);	 
 
 
 #ifdef __cplusplus

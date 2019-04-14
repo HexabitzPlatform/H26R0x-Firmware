@@ -89,16 +89,9 @@ int main(void)
 /* FrontEndTask function */
 void FrontEndTask(void * argument)
 {
-	//StartScastDMAStream(P4, 0, P_RS485, 0, BIDIRECTIONAL, 0xFFFFFFFF, 0xFFFFFFFF, true);
-	
   /* Infinite loop */
   for(;;)
   {
-		RS485_DRIVER_EN();
-		SendMessageFromPort(P_RS485, myID, 0, CODE_ping, 0);
-		RS485_DRIVER_DIS();
-		//IND_blink(100);
-		Delay_ms(100);
 
 	}
 }
