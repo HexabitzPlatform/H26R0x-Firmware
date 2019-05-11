@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : H26R0_gpio.c
+  * File Name          : H08R6_i2c.c
   * Description        : This file provides code for the configuration
-  *                      of all used GPIO pins.
+  *                      of the I2C instances.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -33,57 +33,62 @@
   */
 
 /*
-		MODIFIED by Hexabitz for BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
+    MODIFIED by Hexabitz for BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
     All rights reserved
 */
 
 /* Includes ------------------------------------------------------------------*/
 #include "BOS.h"
 
+
+I2C_HandleTypeDef hi2c1;
+
 /*----------------------------------------------------------------------------*/
-/* Configure GPIO                                                             */
+/* Configure I2C                                                             */
 /*----------------------------------------------------------------------------*/
 
-/** Pinout Configuration
+/** I2C Configuration
 */
-void MX_GPIO_Init(void)
+void MX_I2C_Init(void)
 {
   /* GPIO Ports Clock Enable */
   __GPIOC_CLK_ENABLE();
   __GPIOA_CLK_ENABLE();
   __GPIOD_CLK_ENABLE();
-	__GPIOB_CLK_ENABLE();
-	__GPIOF_CLK_ENABLE();		// for HSE and Boot0
-	
-	IND_LED_Init();
+  __GPIOB_CLK_ENABLE();
+  __GPIOF_CLK_ENABLE();   // for HSE and Boot0
+
+  MX_I2C1_Init();
 }
 
 //-- Configure indicator LED
-void IND_LED_Init(void)
+void MX_I2C1_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct;
-	
-	GPIO_InitStruct.Pin = _IND_LED_PIN;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(_IND_LED_PORT, &GPIO_InitStruct);
+
+  hi2c1.Instance = I2C1;
+  /* hi2c2.Init.Timing = 0x2010091A; */ /* fast mode: 400 KHz */
+  hi2c1.Init.Timing = 0x20303E5D; /* Standard mode: 100 KHz */
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  HAL_I2C_Init(&hi2c1);
+
+    /**Configure Analogue filter
+    */
+  HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE);
+
+    /**Configure Digital filter
+    */
+  HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0);
 }
 
-//-- Configure indicator LED
-void HX711_GPIO_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStruct;
-	
-	GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_9;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-	GPIO_InitStruct.Pin = GPIO_PIN_10;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);	
-}
+/*-----------------------------------------------------------*/
+
+
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

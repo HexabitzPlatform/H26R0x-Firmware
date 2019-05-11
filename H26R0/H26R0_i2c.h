@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : H26R0_gpio.c
-  * Description        : This file provides code for the configuration
-  *                      of all used GPIO pins.
+  * File Name          : H08R6_i2c.h
+  * Description        : This file contains all the functions prototypes for
+  *                      the i2c
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -37,53 +37,26 @@
     All rights reserved
 */
 
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __i2c_H
+#define __i2c_H
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
-#include "BOS.h"
+#include "stm32f0xx_hal.h"
 
-/*----------------------------------------------------------------------------*/
-/* Configure GPIO                                                             */
-/*----------------------------------------------------------------------------*/
+extern I2C_HandleTypeDef hi2c1;
 
-/** Pinout Configuration
-*/
-void MX_GPIO_Init(void)
-{
-  /* GPIO Ports Clock Enable */
-  __GPIOC_CLK_ENABLE();
-  __GPIOA_CLK_ENABLE();
-  __GPIOD_CLK_ENABLE();
-	__GPIOB_CLK_ENABLE();
-	__GPIOF_CLK_ENABLE();		// for HSE and Boot0
-	
-	IND_LED_Init();
+
+extern void MX_I2C_Init(void);
+extern void MX_I2C1_Init(void);
+
+#ifdef __cplusplus
 }
+#endif
+#endif /*__i2c_H */
 
-//-- Configure indicator LED
-void IND_LED_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStruct;
-	
-	GPIO_InitStruct.Pin = _IND_LED_PIN;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(_IND_LED_PORT, &GPIO_InitStruct);
-}
-
-//-- Configure indicator LED
-void HX711_GPIO_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStruct;
-	
-	GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_9;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-	GPIO_InitStruct.Pin = GPIO_PIN_10;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);	
-}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

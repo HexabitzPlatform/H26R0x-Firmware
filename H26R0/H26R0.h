@@ -16,7 +16,7 @@
 #include "H26R0_uart.h"	
 #include "H26R0_gpio.h"	
 #include "H26R0_dma.h"	
-	
+#include "H26R0_i2c.h"	
 	
 /* Exported definitions -------------------------------------------------------*/
 
@@ -123,7 +123,9 @@ extern void MX_USART6_UART_Init(void);
 	|																APIs	 																 	|
    ----------------------------------------------------------------------- 
 */
-
+void SetHX711(uint8_t Data_Rate,uint8_t Gain);
+void readHX711(void);
+float Calibration(uint16_t full_scale,float Output,float zero_offset);
 
 
 /* -----------------------------------------------------------------------

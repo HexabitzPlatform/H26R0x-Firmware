@@ -46,7 +46,6 @@
 /* Private function prototypes -----------------------------------------------*/
 
 
-
 /* Main functions ------------------------------------------------------------*/
 
 int main(void)
@@ -74,13 +73,12 @@ int main(void)
   
   /* We should never get here as control is now taken by the scheduler */
 
+
   /* Infinite loop */
   while (1)
   {
 
-
   }
-
 
 }
 
@@ -92,9 +90,13 @@ void FrontEndTask(void * argument)
   /* Infinite loop */
   for(;;)
   {
-
+	SetHX711(0,128);
+	readHX711();
+	Calibration(3000,2,0);
 	}
+
 }
+
 
 /*-----------------------------------------------------------*/
 
