@@ -123,9 +123,13 @@ extern void MX_USART6_UART_Init(void);
 	|																APIs	 																 	|
    ----------------------------------------------------------------------- 
 */
-void SetHX711(uint8_t Data_Rate,uint8_t Gain);
-void readHX711(void);
-float Calibration(uint16_t full_scale,float Output,float zero_offset);
+void SetHX711Rate(uint8_t Data_Rate);
+//void readHX711(void);
+float Calibration(uint16_t Full_Scale, float Cell_Output, float Cell_Drift);
+float SampleGram(uint8_t ch);
+float SampleKGram(uint8_t ch);
+float SampleOunce(uint8_t ch);
+float SamplePound(uint8_t ch);
 
 
 /* -----------------------------------------------------------------------

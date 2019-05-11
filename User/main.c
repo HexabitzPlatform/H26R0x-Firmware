@@ -87,12 +87,14 @@ int main(void)
 /* FrontEndTask function */
 void FrontEndTask(void * argument)
 {
+	SetHX711Rate(10);
+	Calibration(3000,2,0.024);
+
   /* Infinite loop */
   for(;;)
   {
-	SetHX711(0,128);
-	readHX711();
-	Calibration(3000,2,0);
+		SampleOunce(1);
+		Delay_ms(500);
 	}
 
 }
