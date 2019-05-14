@@ -88,13 +88,16 @@ int main(void)
 void FrontEndTask(void * argument)
 {
 	SetHX711Rate(10);
-	Calibration(3000,2,0.024);
+	Calibration(3000,2,0.0094);
 
   /* Infinite loop */
   for(;;)
   {
 		SampleOunce(1);
 		Delay_ms(500);
+		PowerDown();
+		Delay_ms(2000);
+		PowerOn();
 	}
 
 }

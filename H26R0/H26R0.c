@@ -39,7 +39,7 @@ UART_HandleTypeDef huart6;
 #define g 9.80665 
 #define Kg2Pound_ratio 2.20462262 
 #define Kg2Ounce_ratio 35.274
-
+#define IC_drift 0.0           //00004
 
 uint8_t pulses=0;
 uint8_t rate=0;
@@ -139,37 +139,7 @@ uint8_t GetPort(UART_HandleTypeDef *huart)
 	return 0;
 }
 
-
-/* -----------------------------------------------------------------------
-	|																APIs	 																 	|
-   ----------------------------------------------------------------------- 
-*/
-//set HX711 Rate sample per second
-void SetHX711Rate(uint8_t Data_Rate)
-{
-	//make PD_SCK pin zero
-	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
-	//determine IC rate
-	rate=Data_Rate;
-	switch(rate)
-	{
-		case(10): HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_RESET); break;
-		case(80): HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_SET); break;
-		default: HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_RESET);
-	}
-}
-//Set the gain factor of the used channel
-void SetHX711Gain(uint8_t ch)
-{
-	//determine the chanel and the gain factor
-	switch(ch)
-	{
-		case(1): pulses=25;	gain=128; break;  //Chanel A, Gain factor 128
-		//case(64): pulses=26; 	break;  //Chanel A, Gain factor 64
-		case(2): pulses=27; gain=32;	break;  //Chanel B, Gain factor 32
-		default: pulses=25;
-	}
-}
+/*-----------------------------------------------------------*/
 //read value from HX711
 void readHX711()
 {
@@ -209,6 +179,54 @@ void readHX711()
 		}
 		portEXIT_CRITICAL();	
 }
+ 
+/*-----------------------------------------------------------*/
+
+//calculate the weight
+float weightCalculation()
+{
+	rawvalue=(valuef*0.5*AVDD)/(ADC_full_range*gain) + cell_drift + IC_drift;  //+0.000022;
+	weight=(rawvalue*full_scale)/calibration_factor;
+	return(weight);	
+}
+
+
+/* -----------------------------------------------------------------------
+	|																APIs	 																 	|
+   ----------------------------------------------------------------------- 
+*/
+//set HX711 Rate sample per second
+void SetHX711Rate(uint8_t Data_Rate)
+{
+	//make PD_SCK pin zero
+	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
+	//determine IC rate
+	rate=Data_Rate;
+	switch(rate)
+	{
+		case(10): HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_RESET); break;
+		case(80): HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_SET); break;
+		default: HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_RESET);
+	}
+}
+
+/*-----------------------------------------------------------*/
+
+//Set the gain factor of the used channel
+void SetHX711Gain(uint8_t ch)
+{
+	//determine the chanel and the gain factor
+	switch(ch)
+	{
+		case(1): pulses=25;	gain=128; break;  //Chanel A, Gain factor 128
+		//case(64): pulses=26; 	break;  //Chanel A, Gain factor 64
+		case(2): pulses=27; gain=32;	break;  //Chanel B, Gain factor 32
+		default: pulses=25;
+	}
+}
+
+/*-----------------------------------------------------------*/
+
 //enter the calibration values of the load cell
 float Calibration(uint16_t Full_Scale,float Cell_Output,float Cell_Drift)
 {
@@ -218,14 +236,10 @@ float Calibration(uint16_t Full_Scale,float Cell_Output,float Cell_Drift)
 	calibration_factor=cell_output*AVDD/1000.0f;		// mV	
 	return 0;
 }
-//calculate the weight
-float weightCalculation()
-{
-	rawvalue=(valuef*0.5*AVDD)/(ADC_full_range*gain) + cell_drift;  //+0.000022;
-	weight=(rawvalue*full_scale)/calibration_factor;
-	return(weight);	
-}
-//read weight value from channel ch from HX711 and return weight in Gram
+
+/*-----------------------------------------------------------*/
+
+//read weight value from channel ch of HX711 and return weight in Gram
 float SampleGram(uint8_t ch)
 {
 	uint8_t i=0;
@@ -234,7 +248,10 @@ float SampleGram(uint8_t ch)
 	weightGram=weightCalculation()*1000;
 	return(weightGram);
 }
-//read weight value from channel ch from HX711 and return weight in KGram
+
+/*-----------------------------------------------------------*/
+
+//read weight value from channel ch of HX711 and return weight in KGram
 float SampleKGram(uint8_t ch)
 {
 	uint8_t i=0;
@@ -243,7 +260,10 @@ float SampleKGram(uint8_t ch)
 	weightKGram=weightCalculation();
 	return(weightKGram);
 }
-//read weight value from channel ch from HX711 and return weight in Ounce
+
+/*-----------------------------------------------------------*/
+
+//read weight value from channel ch of HX711 and return weight in Ounce
 float SampleOunce(uint8_t ch)
 {
 	uint8_t i=0;
@@ -252,7 +272,10 @@ float SampleOunce(uint8_t ch)
 	weightOunce=weightCalculation()*Kg2Ounce_ratio;
 	return(weightKGram);
 }
-//read weight value from channel ch from HX711 and return weight in Pound
+
+/*-----------------------------------------------------------*/
+
+//read weight value from channel ch of HX711 and return weight in Pound
 float SamplePound(uint8_t ch)
 {
 	uint8_t i=0;
@@ -261,6 +284,123 @@ float SamplePound(uint8_t ch)
 	weightPound=weightCalculation()*Kg2Pound_ratio;  
 	return(weightKGram);
 }
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to port
+void StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+{
+uint8_t ch=Ch;
+	uint8_t port=Port;
+	uint8_t module=Module;
+	uint32_t period=Period;
+	uint32_t timeout=Timeout;
+	
+}	
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to port
+void StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+{
+uint8_t ch=Ch;
+	uint8_t port=Port;
+	uint8_t module=Module;
+	uint32_t period=Period;
+	uint32_t timeout=Timeout;
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to port
+void StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+{
+uint8_t ch=Ch;
+	uint8_t port=Port;
+	uint8_t module=Module;
+	uint32_t period=Period;
+	uint32_t timeout=Timeout;
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to port
+void StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+{
+uint8_t ch=Ch;
+	uint8_t port=Port;
+	uint8_t module=Module;
+	uint32_t period=Period;
+	uint32_t timeout=Timeout;
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to buffer
+void StreamGramToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout)
+{
+	uint8_t ch=Ch;
+	uint8_t period=Period;
+	uint8_t timeout=Timeout;
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to buffer
+void StreamKGramToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout)
+{
+	uint8_t ch=Ch;
+	uint8_t period=Period;
+	uint8_t timeout=Timeout;
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to buffer
+void StreamOunceToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout)
+{
+	uint8_t ch=Ch;
+	uint8_t period=Period;
+	uint8_t timeout=Timeout;
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to buffer
+void StreamPoundToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout)
+{
+	uint8_t ch=Ch;
+	uint8_t period=Period;
+	uint8_t timeout=Timeout;
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//HX711 Power Down
+void PowerDown(void)
+{
+//make PD_SCK pin high
+	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_SET);
+	
+}
+
+/*-----------------------------------------------------------*/
+
+//HX711 Power Down
+void PowerOn(void)
+{
+//make PD_SCK pin high
+	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
+	
+}
+
 
 /*-----------------------------------------------------------*/
 

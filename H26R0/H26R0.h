@@ -130,8 +130,17 @@ float SampleGram(uint8_t ch);
 float SampleKGram(uint8_t ch);
 float SampleOunce(uint8_t ch);
 float SamplePound(uint8_t ch);
-
-
+void StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+void StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+void StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+void StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+void StreamGramToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+void StreamKGramToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+void StreamOunceToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+void StreamPoundToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+float Average(uint8_t ch, uint8_t samples);
+void PowerDown(void);
+void PowerOn(void);
 /* -----------------------------------------------------------------------
 	|															Commands																 	|
    ----------------------------------------------------------------------- 
