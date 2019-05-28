@@ -33,9 +33,6 @@ UART_HandleTypeDef huart6;
 
 /* Private variables ---------------------------------------------------------*/
 /* Define HX711 pins */
-#define RATE_pin             GPIO_PIN_6
-#define DOUT                 GPIO_PIN_10
-#define PD_SCK               GPIO_PIN_9
 #define AVDD                 2.44
 
 /* Define preprocessor variables */
@@ -543,7 +540,7 @@ float Calibration(uint16_t Full_Scale,float Cell_Output,float Cell_Drift)
 	full_scale=Full_Scale;
 	cell_drift=Cell_Drift/1000.0f;
 	calibration_factor=cell_output*AVDD/1000.0f;		// mV	
-	return 0;
+	return H26R0_OK;
 }
 
 /*-----------------------------------------------------------*/

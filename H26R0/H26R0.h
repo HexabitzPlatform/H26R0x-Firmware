@@ -16,7 +16,7 @@
 #include "H26R0_uart.h"	
 #include "H26R0_gpio.h"	
 #include "H26R0_dma.h"	
-#include "H26R0_i2c.h"	
+	
 	
 /* Exported definitions -------------------------------------------------------*/
 
@@ -84,9 +84,12 @@
 /* Module_Status Type Definition */
 
 /* Module-specific Definitions */
+#define RATE_pin             GPIO_PIN_6
+#define DOUT                 GPIO_PIN_10
+#define PD_SCK               GPIO_PIN_9
 #define TIMERID_TIMEOUT_MEASUREMENT   0xFF
 
-/* H01R0_Status Type Definition */  
+/* H26R0_Status Type Definition */  
 typedef enum 
 {
   H26R0_OK = 0,
