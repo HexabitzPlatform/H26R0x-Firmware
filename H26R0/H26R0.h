@@ -78,14 +78,20 @@
 #define	USART6_RX_PORT	GPIOA
 #define	USART6_AF				GPIO_AF5_USART6
 
-/* Module-specific Definitions */
+#define STOP_MEASUREMENT_RANGING      0
+#define START_MEASUREMENT_RANGING     1
 
+/* Module_Status Type Definition */
+
+/* Module-specific Definitions */
+#define TIMERID_TIMEOUT_MEASUREMENT   0xFF
 
 /* H01R0_Status Type Definition */  
 typedef enum 
 {
   H26R0_OK = 0,
 	H26R0_ERR_UnknownMessage = 1,
+	H26R0_ERR_WrongParams,
 	H26R0_ERROR = 255
 } Module_Status;
 
@@ -124,7 +130,6 @@ extern void MX_USART6_UART_Init(void);
    ----------------------------------------------------------------------- 
 */
 void SetHX711Rate(uint8_t Data_Rate);
-//void readHX711(void);
 float Calibration(uint16_t Full_Scale, float Cell_Output, float Cell_Drift);
 float SampleGram(uint8_t ch);
 float SampleKGram(uint8_t ch);
@@ -145,8 +150,12 @@ void PowerOn(void);
 	|															Commands																 	|
    ----------------------------------------------------------------------- 
 */
-
-
+/*static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+*/
 
 
 #endif /* H26R0_H */

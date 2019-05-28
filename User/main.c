@@ -41,7 +41,8 @@
 
 
 /* Private variables ---------------------------------------------------------*/
-
+float wei=0.0;
+float weight=0.0;
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -93,11 +94,10 @@ void FrontEndTask(void * argument)
   /* Infinite loop */
   for(;;)
   {
-		SampleOunce(1);
+		weight=SampleKGram(1);
 		Delay_ms(500);
-		PowerDown();
-		Delay_ms(2000);
-		PowerOn();
+		//wei=Average(1,10);
+		Delay_ms(500);
 	}
 
 }
