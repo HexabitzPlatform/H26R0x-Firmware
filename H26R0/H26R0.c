@@ -61,7 +61,7 @@ uint16_t full_scale=0;
 uint32_t Data=0, value=0;
 uint8_t global_ch, global_port, global_module, mode, unit;
 uint32_t global_period, global_timeout, t0;
-float *buffer;
+float *weight_buffer;
 float valuef = 0.0f, rawvalue=0.0f;
 float calibration_factor=0.0f;
 static float cell_output=0.0;
@@ -94,7 +94,7 @@ static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 const CLI_Command_Definition_t sampleCommandDefinition =
 {
   ( const int8_t * ) "sample", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) sample:\r\nTake one sample from ch (1 or 2)\r\n\r\n",
+  ( const int8_t * ) "(H26R0) sample:\r\n Take one sample from ch (1 or 2)\r\n\r\n",
   sampleCommand, /* The function to run. */
   1 /* No parameters are expected. */
 };
@@ -103,16 +103,16 @@ const CLI_Command_Definition_t sampleCommandDefinition =
 const CLI_Command_Definition_t streamCommandDefinition =
 {
   ( const int8_t * ) "stream", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) stream:\r\nStream from ch (1 or 2) to the CLI with period (ms) and total time (ms). \r\n\r\n",
+  ( const int8_t * ) "(H26R0) stream:\r\n Stream from ch (1 or 2) to the CLI with period (ms) and total time (ms). \r\n\r\n",
   streamCommand, /* The function to run. */
-  5 /* No parameters are expected. */
+  -1 /* No parameters are expected. */
 };
 
 /* CLI command structure : stop */
 const CLI_Command_Definition_t stopCommandDefinition =
 {
   ( const int8_t * ) "stop", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) stop:\r\nStop the HX711\r\n\r\n",
+  ( const int8_t * ) "(H26R0) stop:\r\n Stop the HX711\r\n\r\n",
   stopCommand, /* The function to run. */
   0 /* No parameters are expected. */
 };
@@ -121,7 +121,7 @@ const CLI_Command_Definition_t stopCommandDefinition =
 const CLI_Command_Definition_t unitCommandDefinition =
 {
   ( const int8_t * ) "unit", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) unit:\r\nSet the measurement unit (g, kg, ounce, lb)\r\n\r\n",
+  ( const int8_t * ) "(H26R0) unit:\r\n Set the measurement unit (g, kg, ounce, lb)\r\n\r\n",
   unitCommand, /* The function to run. */
   1 /* No parameters are expected. */
 };
@@ -130,7 +130,7 @@ const CLI_Command_Definition_t unitCommandDefinition =
 const CLI_Command_Definition_t rateCommandDefinition =
 {
   ( const int8_t * ) "rate", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) rate:\r\nSet HX711 measurement rate in sample per second (10, 80)\r\n\r\n",
+  ( const int8_t * ) "(H26R0) rate:\r\n Set HX711 measurement rate in sample per second (10, 80)\r\n\r\n",
   rateCommand, /* The function to run. */
   1 /* No parameters are expected. */
 };
@@ -317,6 +317,7 @@ void SendResults(float message, uint8_t mode, uint8_t unit, uint8_t Port, uint8_
 		}
 		else
 		{
+			sprintf( ( char * ) strUnit, "Kg");
 			/* nothing to do here */
 		}
 	}
@@ -389,12 +390,14 @@ void SendResults(float message, uint8_t mode, uint8_t unit, uint8_t Port, uint8_
       numberOfParams = sizeof(float);
       memcpy(messageParams, &Raw_Msg, sizeof(float));
       SendMessageFromPort(global_port, myID, global_module, Raw_Msg, numberOfParams);
+			CheckForEnterKey();
       break;
 		
     case SAMPLE_BUFFER_CASE:
 		case STREAM_BUFFER_CASE:
-      memset(buffer, 0, sizeof(float));
-      memcpy(buffer, &Raw_Msg, sizeof(float));
+      memset(weight_buffer, 0, sizeof(float));
+      memcpy(weight_buffer, &Raw_Msg, sizeof(float));
+			CheckForEnterKey();
       break;
 		/*
     case REQ_OUT_RANGE_CLI:
@@ -471,14 +474,14 @@ void LoadcellTask(void * argument)
 			case STREAM_PORT_CASE: 
 				DATA_To_SEND=SampleKGram(global_ch);	
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-					SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+					SendResults(DATA_To_SEND, mode, unit, global_port, global_module, NULL);
 		  break;
 			case STREAM_BUFFER_CASE: 
 				DATA_To_SEND=SampleKGram(global_ch);	
-				SendResults(DATA_To_SEND, unit, mode, 0, 0, buffer); break;
-			default: break;
+				SendResults(DATA_To_SEND, unit, mode, 0, 0, weight_buffer); break;
+			default: mode = IDLE_CASE; break;
 		}
-		mode = IDLE_CASE;
+		
 		taskYIELD();
 	}
 }
@@ -495,6 +498,7 @@ static void HandleTimeout(TimerHandle_t xTimer)
   if (TIMERID_TIMEOUT_MEASUREMENT == tid)
   {
 		mode = IDLE_CASE;		// Stop the streaming task
+		startMeasurementRanging = STOP_MEASUREMENT_RANGING;     // stop streaming
   }
 }
 /* -----------------------------------------------------------------------
@@ -630,7 +634,15 @@ void StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=KGram;
-	
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
 }
 
 /*-----------------------------------------------------------*/
@@ -645,7 +657,15 @@ void StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Ounce;
-
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
 }
 
 /*-----------------------------------------------------------*/
@@ -660,7 +680,37 @@ void StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Pound;
-	
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
+}
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to CLI
+void StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
+{
+	global_ch=Ch;
+	global_period=Period;
+	global_timeout=Timeout;
+	mode=STREAM_CLI_CASE;
+	//unit=KGram;
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
+	startMeasurementRanging = START_MEASUREMENT_RANGING;
 }
 
 /*-----------------------------------------------------------*/
@@ -671,10 +721,18 @@ void StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	buffer=Buffer;
+	weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Gram;
-	
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
 }
 
 /*-----------------------------------------------------------*/
@@ -685,9 +743,18 @@ void StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	buffer=Buffer;
+	//weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=KGram;
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
 }
 
 /*-----------------------------------------------------------*/
@@ -698,9 +765,18 @@ void StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	buffer=Buffer;
+	weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Ounce;
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
 }
 
 /*-----------------------------------------------------------*/
@@ -711,9 +787,18 @@ void StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	buffer=Buffer;
+	weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Pound;
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
 }
 
 /*-----------------------------------------------------------*/
@@ -793,17 +878,130 @@ static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 
 static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
+static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to internal buffer. Access in the CLI using module parameter: weight\n\r";
+	static const int8_t *pcMessageModule = ( int8_t * ) "Streaming measurements to port P%d in module #%d\n\r";
+	static const int8_t *pcMessageCLI = ( int8_t * ) "Streaming measurements to the CLI\n\n\r";
+	static const int8_t *pcMessageError = ( int8_t * ) "Wrong parameter\r\n";
+  int8_t *pcParameterString1; /* ch */
+	int8_t *pcParameterString2; /* period */
+  int8_t *pcParameterString3; /* timeout */
+  int8_t *pcParameterString4; /* port or buffer */
+  int8_t *pcParameterString5; /* module */
+  portBASE_TYPE xParameterStringLength1 = 0;
+  portBASE_TYPE xParameterStringLength2 = 0;
+  portBASE_TYPE xParameterStringLength3 = 0;
+  portBASE_TYPE xParameterStringLength4 = 0;
+	portBASE_TYPE xParameterStringLength5 = 0;
+  uint32_t period = 0;
+  uint32_t timeout = 0;
+  uint8_t port = 0;
+  uint8_t module = 0;
+	uint8_t channel = 1;
+	float *buffer;
+  Module_Status result = H26R0_OK;
 
-	//mode=STREAM_CLI_CASE;
-	//SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+  /* Remove compile time warnings about unused parameters, and check the
+  write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+  write buffer length is adequate, so does not check for buffer overflows. */
+  ( void ) xWriteBufferLen;
+  configASSERT( pcWriteBuffer );
+
+  /* Obtain the 1st parameter string: channel */
+  pcParameterString1 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 1, &xParameterStringLength1);
+  /* Obtain the 2nd parameter string: period */
+  pcParameterString2 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 2, &xParameterStringLength2);
+  /* Obtain the 3rd parameter string: timeout */
+  pcParameterString3 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 3, &xParameterStringLength3);
+  /* Obtain the 4th parameter string: port */
+  pcParameterString4 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 4, &xParameterStringLength4);
+	/* Obtain the 5th parameter string: module */
+	pcParameterString5 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 5, &xParameterStringLength5);
+
+  if (NULL != pcParameterString1)
+  {
+    channel = atoi( (char *)pcParameterString1);
+  }
+  else
+  {
+    result = H26R0_ERR_WrongParams;
+  }
+	if (NULL != pcParameterString2)
+  {
+    period = atoi( (char *)pcParameterString2);
+  }
+  else
+  {
+    result = H26R0_ERR_WrongParams;
+  }
+  if (NULL != pcParameterString3)
+  {
+    if (!strncmp((const char *)pcParameterString3, "inf", 3))
+    {
+      timeout = portMAX_DELAY;
+    }
+    else
+    {
+      timeout = atoi( (char *)pcParameterString3);
+    }
+  }
+  else
+  {
+    result = H26R0_ERR_WrongParams;
+  }
+	/* streaming data to internal buffer (module parameter) */
+	if (NULL != pcParameterString4 && !strncmp((const char *)pcParameterString4, "buffer", 6)) 
+	{
+		//buffer = atoi( (char *)pcParameterString3);
+		strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageBuffer);
+		StreamKGramToBuffer(channel, buffer, period, timeout);
+		// Return right away here as we don't want to block the CLI
+		return pdFALSE;
+	} 
+	/* streaming data to port */
+	else if (NULL != pcParameterString4 && NULL != pcParameterString5 && pcParameterString4[0] == 'p') 
+	{
+		port = ( uint8_t ) atol( ( char * ) pcParameterString4+1 );
+		module = atoi( (char *)pcParameterString5);
+		sprintf( ( char * ) pcWriteBuffer, ( char * ) pcMessageModule, port, module);
+		StreamKGramToPort(channel, port, module, period, timeout);
+		// Return right away here as we don't want to block the CLI
+		return pdFALSE;
+	} 
+	/* Stream to the CLI */
+	else if (NULL == pcParameterString5) 
+	{	
+		if (NULL != pcParameterString4 && !strncmp((const char *)pcParameterString4, "-v", 2)) {
+			StreamKGramToCLI(channel, period, timeout);
+		} else {
+			strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageCLI);
+			writePxMutex(PcPort, (char *)pcWriteBuffer, strlen((char *)pcWriteBuffer), cmd50ms, HAL_MAX_DELAY);
+			StreamKGramToCLI(channel, period, timeout);
+		}		
+		/* Wait till the end of stream */
+		while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){};
+		/* clean terminal output */
+		memset((char *) pcWriteBuffer, 0, strlen((char *)pcWriteBuffer));
+	}		
+	else 
+	{
+		result = H26R0_ERR_WrongParams;
+	}	
+
+  if (H26R0_ERR_WrongParams == result)
+  {
+    strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageError);
+  }
 	
-	return pdFALSE;
+  /* There is no more data to return after this single string, so return pdFALSE. */
+  return pdFALSE;
+
 }
 
 static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
-PowerDown();
-return 0;	
+	mode=IDLE_CASE;
+  PowerDown();
+  return 0;	
 }
 
 static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
