@@ -21,6 +21,7 @@
 #include "BOS.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "string.h"
 
 /* Define UART variables */
 UART_HandleTypeDef huart1;
@@ -61,7 +62,7 @@ uint16_t full_scale=0;
 uint32_t Data=0, value=0;
 uint8_t global_ch, global_port, global_module, mode, unit;
 uint32_t global_period, global_timeout, t0;
-float *weight_buffer;
+float weight_buffer; float *ptr_weight_buffer;
 float valuef = 0.0f, rawvalue=0.0f;
 float calibration_factor=0.0f;
 static float cell_output=0.0;
@@ -77,7 +78,7 @@ uint8_t startMeasurementRanging = STOP_MEASUREMENT_RANGING;
 /* Private function prototypes -----------------------------------------------*/	
 void readHX711(void);
 float weightCalculation(void);
-void SendResults(float message, uint8_t mode, uint8_t unit, uint8_t Port, uint8_t Module, float *Buffer);
+void SendResults(float message, uint8_t Mode, uint8_t unit, uint8_t Port, uint8_t Module, float *Buffer);
 void LoadcellTask(void * argument);
 void TimerTask(void * argument);
 static void CheckForEnterKey(void);
@@ -266,11 +267,12 @@ float weightCalculation(void)
 /*-----------------------------------------------------------*/
 
 //send results to x
-void SendResults(float message, uint8_t mode, uint8_t unit, uint8_t Port, uint8_t Module, float *Buffer)
+void SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t Module, float *Buffer)
 {
 	float Raw_Msg=0.0f;
 	uint16_t numberOfParams;
   int8_t *pcOutputString;
+	//uint8_t stream_mode;
   static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %.2f\r\n";
 	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%.2f\r\n";
   //static const int8_t *pcOutMaxRange = ( int8_t * ) "MAX\r\n";
@@ -390,14 +392,14 @@ void SendResults(float message, uint8_t mode, uint8_t unit, uint8_t Port, uint8_
       numberOfParams = sizeof(float);
       memcpy(messageParams, &Raw_Msg, sizeof(float));
       SendMessageFromPort(global_port, myID, global_module, Raw_Msg, numberOfParams);
-			CheckForEnterKey();
+			//CheckForEnterKey();
       break;
 		
     case SAMPLE_BUFFER_CASE:
 		case STREAM_BUFFER_CASE:
-      memset(weight_buffer, 0, sizeof(float));
-      memcpy(weight_buffer, &Raw_Msg, sizeof(float));
-			CheckForEnterKey();
+      memset(Buffer, 0, sizeof(float));
+      memcpy(Buffer, &Raw_Msg, sizeof(float));
+			//CheckForEnterKey();
       break;
 		/*
     case REQ_OUT_RANGE_CLI:
@@ -471,14 +473,23 @@ void LoadcellTask(void * argument)
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
 					SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
 		  break;
-			case STREAM_PORT_CASE: 
+				case STREAM_VERBOSE_CASE:
+				t0=HAL_GetTick();
+				DATA_To_SEND=SampleKGram(global_ch);	
+				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
+					SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+		  break;
+			case STREAM_PORT_CASE:
+				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
 					SendResults(DATA_To_SEND, mode, unit, global_port, global_module, NULL);
 		  break;
 			case STREAM_BUFFER_CASE: 
+				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
-				SendResults(DATA_To_SEND, unit, mode, 0, 0, weight_buffer); break;
+				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
+				SendResults(DATA_To_SEND, unit, mode, 0, 0, ptr_weight_buffer); break;
 			default: mode = IDLE_CASE; break;
 		}
 		
@@ -713,6 +724,29 @@ void StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 	startMeasurementRanging = START_MEASUREMENT_RANGING;
 }
 
+
+/*-----------------------------------------------------------*/
+
+//stream weightvalue from channel ch to CLI
+void StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
+{
+	global_ch=Ch;
+	global_period=Period;
+	global_timeout=Timeout;
+	mode=STREAM_VERBOSE_CASE;
+	//unit=KGram;
+		TimerHandle_t xTimer = NULL;
+	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+  {
+	  /* start software timer which will create event timeout */
+  /* Create a timeout timer */
+  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+  /* Start the timeout timer */
+  xTimerStart( xTimer, portMAX_DELAY );
+	}
+	startMeasurementRanging = START_MEASUREMENT_RANGING;
+}
+
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to buffer
@@ -721,7 +755,7 @@ void StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	weight_buffer=Buffer;
+	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Gram;
 		TimerHandle_t xTimer = NULL;
@@ -743,7 +777,7 @@ void StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	//weight_buffer=Buffer;
+	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=KGram;
 		TimerHandle_t xTimer = NULL;
@@ -765,7 +799,7 @@ void StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	weight_buffer=Buffer;
+	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Ounce;
 		TimerHandle_t xTimer = NULL;
@@ -787,7 +821,7 @@ void StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	weight_buffer=Buffer;
+	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Pound;
 		TimerHandle_t xTimer = NULL;
@@ -953,7 +987,7 @@ static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to i
 	{
 		//buffer = atoi( (char *)pcParameterString3);
 		strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageBuffer);
-		StreamKGramToBuffer(channel, buffer, period, timeout);
+		StreamKGramToBuffer(channel, &weight_buffer, period, timeout);
 		// Return right away here as we don't want to block the CLI
 		return pdFALSE;
 	} 
@@ -971,7 +1005,7 @@ static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to i
 	else if (NULL == pcParameterString5) 
 	{	
 		if (NULL != pcParameterString4 && !strncmp((const char *)pcParameterString4, "-v", 2)) {
-			StreamKGramToCLI(channel, period, timeout);
+			StreamKGramToVERBOSE(channel, period, timeout);
 		} else {
 			strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageCLI);
 			writePxMutex(PcPort, (char *)pcWriteBuffer, strlen((char *)pcWriteBuffer), cmd50ms, HAL_MAX_DELAY);
