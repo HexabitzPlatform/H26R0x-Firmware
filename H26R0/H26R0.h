@@ -82,6 +82,7 @@
 #define START_MEASUREMENT_RANGING     1
 
 /* Module_Status Type Definition */
+#define NUM_MODULE_PARAMS		2
 
 /* Module-specific Definitions */
 #define RATE_pin             GPIO_PIN_6
@@ -125,7 +126,10 @@ extern void MX_USART6_UART_Init(void);
    ----------------------------------------------------------------------- 
 */
 
-
+#define CODE_H26R0_SAMPLE_GRAM               2600
+#define CODE_H26R0_SAMPLE_KGRAM              2601
+#define CODE_H26R0_SAMPLE_OUNCE              2602
+#define CODE_H26R0_SAMPLE_POUND              2603
 
 	
 /* -----------------------------------------------------------------------

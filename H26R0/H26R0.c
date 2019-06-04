@@ -31,6 +31,9 @@ UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart6;
 
+/* Module exported parameters ------------------------------------------------*/
+float h08r6_range = 0.0f;
+module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h08r6_range, .paramFormat=FMT_FLOAT, .paramName="weight"}};
 
 /* Private variables ---------------------------------------------------------*/
 /* Define HX711 pins */
@@ -62,7 +65,7 @@ uint16_t full_scale=0;
 uint32_t Data=0, value=0;
 uint8_t global_ch, global_port, global_module, mode, unit;
 uint32_t global_period, global_timeout, t0;
-float weight_buffer; float *ptr_weight_buffer;
+float weight1_buffer, weight2_buffer; float *ptr_weight_buffer;
 float valuef = 0.0f, rawvalue=0.0f;
 float calibration_factor=0.0f;
 static float cell_output=0.0;
@@ -89,6 +92,8 @@ static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE weight1ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE weight2ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 
 /*-----------------------------------------------------------*/
 /* CLI command structure : sample */
@@ -97,7 +102,7 @@ const CLI_Command_Definition_t sampleCommandDefinition =
   ( const int8_t * ) "sample", /* The command string to type. */
   ( const int8_t * ) "(H26R0) sample:\r\n Take one sample from ch (1 or 2)\r\n\r\n",
   sampleCommand, /* The function to run. */
-  1 /* No parameters are expected. */
+  1 /* one parameter is expected. */
 };
 
 /* CLI command structure : stream */
@@ -106,7 +111,7 @@ const CLI_Command_Definition_t streamCommandDefinition =
   ( const int8_t * ) "stream", /* The command string to type. */
   ( const int8_t * ) "(H26R0) stream:\r\n Stream from ch (1 or 2) to the CLI with period (ms) and total time (ms). \r\n\r\n",
   streamCommand, /* The function to run. */
-  -1 /* No parameters are expected. */
+  -1 /* Multiparameters are expected. */
 };
 
 /* CLI command structure : stop */
@@ -124,7 +129,7 @@ const CLI_Command_Definition_t unitCommandDefinition =
   ( const int8_t * ) "unit", /* The command string to type. */
   ( const int8_t * ) "(H26R0) unit:\r\n Set the measurement unit (g, kg, ounce, lb)\r\n\r\n",
   unitCommand, /* The function to run. */
-  1 /* No parameters are expected. */
+  1 /* one parameter is expected. */
 };
 
 /* CLI command structure : rate */
@@ -133,7 +138,27 @@ const CLI_Command_Definition_t rateCommandDefinition =
   ( const int8_t * ) "rate", /* The command string to type. */
   ( const int8_t * ) "(H26R0) rate:\r\n Set HX711 measurement rate in sample per second (10, 80)\r\n\r\n",
   rateCommand, /* The function to run. */
-  1 /* No parameters are expected. */
+  1 /* one parameter is expected. */
+};
+
+/*-----------------------------------------------------------*/
+/* CLI command structure : weight */
+const CLI_Command_Definition_t weight1CommandDefinition =
+{
+  ( const int8_t * ) "weight1", /* The command string to type. */
+		( const int8_t * ) "(H26R0) weight1:\r\nDisplay the value of module parameter: channel_1's weight\r\n\r\n",
+  weight1ModParamCommand, /* The function to run. */
+  0 /* No parameters are expected. */
+};
+
+/*-----------------------------------------------------------*/
+/* CLI command structure : weight */
+const CLI_Command_Definition_t weight2CommandDefinition =
+{
+  ( const int8_t * ) "weight2", /* The command string to type. */
+		( const int8_t * ) "(H26R0) weight2:\r\nDisplay the value of module parameter: channel_2's weight\r\n\r\n",
+  weight2ModParamCommand, /* The function to run. */
+  0 /* No parameters are expected. */
 };
 
 /* -----------------------------------------------------------------------
@@ -192,6 +217,8 @@ void RegisterModuleCLICommands(void)
 	FreeRTOS_CLIRegisterCommand( &stopCommandDefinition);
 	FreeRTOS_CLIRegisterCommand( &unitCommandDefinition);
 	FreeRTOS_CLIRegisterCommand( &rateCommandDefinition);
+	FreeRTOS_CLIRegisterCommand( &weight1CommandDefinition);
+	FreeRTOS_CLIRegisterCommand( &weight2CommandDefinition);
 }
 
 /*-----------------------------------------------------------*/
@@ -987,7 +1014,12 @@ static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to i
 	{
 		//buffer = atoi( (char *)pcParameterString3);
 		strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageBuffer);
-		StreamKGramToBuffer(channel, &weight_buffer, period, timeout);
+		if (channel==1){
+		StreamKGramToBuffer(channel, &weight1_buffer, period, timeout);
+		}
+		else {
+		StreamKGramToBuffer(channel, &weight2_buffer, period, timeout);
+		}			
 		// Return right away here as we don't want to block the CLI
 		return pdFALSE;
 	} 
@@ -1116,7 +1148,43 @@ static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 	SetHX711Rate(rate);
 	return 0;	
 }
-			
+
+/*-----------------------------------------------------------*/
+
+static portBASE_TYPE weight1ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
+{
+  static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%.2f\r\n";
+
+  /* Remove compile time warnings about unused parameters, and check the
+  write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+  write buffer length is adequate, so does not check for buffer overflows. */
+  ( void ) xWriteBufferLen;
+  configASSERT( pcWriteBuffer );
+
+  sprintf( ( char * ) pcWriteBuffer, ( char * ) pcWeightVerboseMsg, weight1_buffer);
+
+  /* There is no more data to return after this single string, so return pdFALSE. */
+  return pdFALSE;
+}
+
+/*-----------------------------------------------------------*/
+
+static portBASE_TYPE weight2ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
+{
+  static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%.2f\r\n";
+
+  /* Remove compile time warnings about unused parameters, and check the
+  write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+  write buffer length is adequate, so does not check for buffer overflows. */
+  ( void ) xWriteBufferLen;
+  configASSERT( pcWriteBuffer );
+
+  sprintf( ( char * ) pcWriteBuffer, ( char * ) pcWeightVerboseMsg, weight2_buffer);
+
+  /* There is no more data to return after this single string, so return pdFALSE. */
+  return pdFALSE;
+}
+
 /*-----------------------------------------------------------*/
 
 
