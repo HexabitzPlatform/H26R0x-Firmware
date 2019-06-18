@@ -428,18 +428,21 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		
     case SAMPLE_PORT_CASE:
     case STREAM_PORT_CASE:
-      memset(messageParams, 0, sizeof(messageParams));
-      numberOfParams = sizeof(float);
-      memcpy(messageParams, &Raw_Msg, sizeof(float));
-      SendMessageFromPort(global_port, myID, global_module, Raw_Msg, numberOfParams);
-			//CheckForEnterKey();
+		if (Module==myID){
+				writePxITMutex(Port, (char *)&Raw_Msg, sizeof(Raw_Msg), 10);
+		}
+		else{
+			//Raw_Msg=123.4;
+		    messageParams[0]=Port;
+			  memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
+			  SendMessageToModule(Module, CODE_port_forward, sizeof(float)+1);
+		}
       break;
 		
     case SAMPLE_BUFFER_CASE:
 		case STREAM_BUFFER_CASE:
       memset(Buffer, 0, sizeof(float));
       memcpy(Buffer, &Raw_Msg, sizeof(float));
-			//CheckForEnterKey();
       break;
 		/*
     case REQ_OUT_RANGE_CLI:
@@ -504,15 +507,16 @@ static void CheckForEnterKey(void)
 //load cell stream task
 void LoadcellTask(void * argument)
 {
+	uint32_t t0=0;
 	while(1)
 	{
 		switch(mode)
 		{
 			case STREAM_CLI_CASE:
 				t0=HAL_GetTick();
-				DATA_To_SEND=SampleKGram(global_ch);	
-				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-					SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+				DATA_To_SEND=SampleKGram(global_ch);		
+				SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+				while(HAL_GetTick()-t0<(global_period-1)) {taskYIELD();}
 		  break;
 				case STREAM_VERBOSE_CASE:
 				t0=HAL_GetTick();
@@ -1121,11 +1125,15 @@ static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to i
 	else if (NULL != pcParameterString4 && NULL != pcParameterString5 && pcParameterString4[0] == 'p') 
 	{
 		port = ( uint8_t ) atol( ( char * ) pcParameterString4+1 );
-		module = atoi( (char *)pcParameterString5);
-		sprintf( ( char * ) pcWriteBuffer, ( char * ) pcMessageModule, port, module);
-		StreamKGramToPort(channel, port, module, period, timeout);
-		// Return right away here as we don't want to block the CLI
-		return pdFALSE;
+		module = (uint8_t) GetID((char *)pcParameterString5);
+		if (module != (uint8_t) BOS_ERR_WrongName) {
+			sprintf( ( char * ) pcWriteBuffer, ( char * ) pcMessageModule, port, module);
+			StreamKGramToPort(channel, port, module, period, timeout);
+			// Return right away here as we don't want to block the CLI
+			return pdFALSE;
+		} else {
+			strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageWrongName);
+		}
 	} 
 	/* Stream to the CLI */
 	else if (NULL == pcParameterString5) 
