@@ -206,10 +206,40 @@ void Module_Init(void)
 Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uint8_t dst)
 {
 	Module_Status result = H26R0_OK;
+  uint32_t period = 0;
+  uint32_t timeout = 0;
+	//TimerHandle_t xTimer = NULL;
 	
 	switch (code)
 	{
-
+		case (CODE_H26R0_SET_RATE):
+			SetHX711Rate(messageParams[0]);
+		break;
+		case (CODE_H26R0_STREAM_PORT_GRAM):
+			period = ( (uint32_t) cMessage[port-1][1] << 24 ) + ( (uint32_t) cMessage[port-1][2] << 16 ) + ( (uint32_t) cMessage[port-1][3] << 8 ) + cMessage[port-1][4];
+			timeout = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
+			StreamGramToPort(messageParams[0], period, timeout, messageParams[9], messageParams[10]);
+		break;
+		case (CODE_H26R0_STREAM_PORT_KGRAM):
+			period = ( (uint32_t) cMessage[port-1][1] << 24 ) + ( (uint32_t) cMessage[port-1][2] << 16 ) + ( (uint32_t) cMessage[port-1][3] << 8 ) + cMessage[port-1][4];
+			timeout = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
+			StreamKGramToPort(messageParams[0], period, timeout, messageParams[9], messageParams[10]);
+		break;
+      case (CODE_H26R0_STREAM_PORT_OUNCE):
+			period = ( (uint32_t) cMessage[port-1][1] << 24 ) + ( (uint32_t) cMessage[port-1][2] << 16 ) + ( (uint32_t) cMessage[port-1][3] << 8 ) + cMessage[port-1][4];
+			timeout = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
+			StreamOunceToPort(messageParams[0], period, timeout, messageParams[9], messageParams[10]);
+		break;
+		case (CODE_H26R0_STREAM_PORT_POUND):
+			period = ( (uint32_t) cMessage[port-1][1] << 24 ) + ( (uint32_t) cMessage[port-1][2] << 16 ) + ( (uint32_t) cMessage[port-1][3] << 8 ) + cMessage[port-1][4];
+			timeout = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
+			StreamPoundToPort(messageParams[0], period, timeout, messageParams[9], messageParams[10]);
+		break;
+		case (CODE_H26R0_STOP):
+			mode=IDLE_CASE;
+			PowerDown();
+			xTimerStop( xTimer, portMAX_DELAY );
+		break;
 		default:
 			result = H26R0_ERR_UnknownMessage;
 			break;
