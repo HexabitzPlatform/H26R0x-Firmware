@@ -299,10 +299,9 @@ float weightCalculation(void)
 /*-----------------------------------------------------------*/
 
 //send results to x
-void SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t Module, float *Buffer)
+int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t Module, float *Buffer)
 {
 	float Raw_Msg=0.0f;
-	uint16_t numberOfParams;
   int8_t *pcOutputString;
 	//uint8_t stream_mode;
   static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %.2f\r\n";
@@ -472,6 +471,7 @@ void SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_
 	if (mode != STREAM_VERBOSE_CASE && mode != STREAM_PORT_CASE){
 		free(strUnit);
 	}
+	return (H26R0_OK);
 }
 
 /* --- Check for CLI stop key*/
@@ -645,7 +645,7 @@ float SamplePound(uint8_t ch)
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to port
-void StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+int StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_port=Port;
@@ -663,12 +663,13 @@ void StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+		return (H26R0_OK);
 }	
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to port
-void StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+int StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_port=Port;
@@ -686,12 +687,13 @@ void StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to port
-void StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+int StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_port=Port;
@@ -709,12 +711,13 @@ void StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to port
-void StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
+int StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_port=Port;
@@ -732,19 +735,20 @@ void StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to CLI
-void StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
+int StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
 	mode=STREAM_CLI_CASE;
 	//unit=KGram;
-		TimerHandle_t xTimer = NULL;
+		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -753,21 +757,26 @@ void StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+	if (global_timeout > 0)
+	{
 	startMeasurementRanging = START_MEASUREMENT_RANGING;
+	}
+	
+		return (H26R0_OK);
 }
 
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to CLI
-void StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
+int StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
 	mode=STREAM_VERBOSE_CASE;
 	//unit=KGram;
-		TimerHandle_t xTimer = NULL;
+		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -776,13 +785,17 @@ void StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+	if (global_timeout > 0)
+	{
 	startMeasurementRanging = START_MEASUREMENT_RANGING;
+	}
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to buffer
-void StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
+int StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
@@ -799,12 +812,14 @@ void StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+	
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to buffer
-void StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
+int StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
@@ -821,12 +836,14 @@ void StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+	
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to buffer
-void StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
+int StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
@@ -843,12 +860,14 @@ void StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+	
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //stream weightvalue from channel ch to buffer
-void StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
+int StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
@@ -865,6 +884,8 @@ void StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Ti
   /* Start the timeout timer */
   xTimerStart( xTimer, portMAX_DELAY );
 	}
+	
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
