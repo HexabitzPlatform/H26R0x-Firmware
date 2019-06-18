@@ -99,6 +99,14 @@ static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 static portBASE_TYPE weight1ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE weight2ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 
+/* CLI command structure : demo */
+const CLI_Command_Definition_t demoCommandDefinition =
+{
+	( const int8_t * ) "demo", /* The command string to type. */
+	( const int8_t * ) "(H26R0) demo:\r\n Run a demo program to test module functionality\r\n\r\n",
+	demoCommand, /* The function to run. */
+	1 /* one parameter is expected. */
+};
 /*-----------------------------------------------------------*/
 /* CLI command structure : sample */
 const CLI_Command_Definition_t sampleCommandDefinition =
@@ -216,6 +224,7 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 */
 void RegisterModuleCLICommands(void)
 {
+	FreeRTOS_CLIRegisterCommand( &demoCommandDefinition );
 	FreeRTOS_CLIRegisterCommand( &sampleCommandDefinition );
 	FreeRTOS_CLIRegisterCommand( &streamCommandDefinition);
 	FreeRTOS_CLIRegisterCommand( &stopCommandDefinition);
@@ -956,6 +965,51 @@ int PowerOn(void)
 	|															Commands																 	|
    ----------------------------------------------------------------------- 
 */
+
+portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
+{
+	static const int8_t *pcMessage = ( int8_t * ) "Streaming weight measurements at 2 Hz for 10 seconds\r\n";
+	int8_t *pcParameterString1; /* ch */
+	portBASE_TYPE xParameterStringLength1 = 0;
+	uint8_t channel = 1;
+	Module_Status result = H26R0_OK;
+	
+	/* Remove compile time warnings about unused parameters, and check the
+	write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+	write buffer length is adequate, so does not check for buffer overflows. */
+	( void ) pcCommandString;
+	( void ) xWriteBufferLen;
+	configASSERT( pcWriteBuffer );
+	
+	  /* Obtain the 1st parameter string: channel */
+  pcParameterString1 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 1, &xParameterStringLength1);
+
+  if (NULL != pcParameterString1)
+  {
+    channel = atoi( (char *)pcParameterString1);
+  }
+  else
+  {
+    result = H26R0_ERR_WrongParams;
+  }
+	
+	/* Respond to the command */
+	strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessage);
+	writePxMutex(PcPort, (char *)pcWriteBuffer, strlen((char *)pcWriteBuffer), cmd50ms, HAL_MAX_DELAY);
+	StreamKGramToCLI(channel, 500, 10000);
+	
+	/* Wait till the end of stream */
+	while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){};
+	/* clean terminal output */
+	memset((char *) pcWriteBuffer, 0, strlen((char *)pcWriteBuffer));
+			
+	/* There is no more data to return after this single string, so return
+	pdFALSE. */
+	return pdFALSE;
+}
+
+/*-----------------------------------------------------------*/
+
 static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
 	/* Remove compile time warnings about unused parameters, and check the
