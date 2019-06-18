@@ -37,7 +37,7 @@ module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h08r6_range, .paramFor
 
 /* Private variables ---------------------------------------------------------*/
 /* Define HX711 pins */
-#define AVDD                 2.44
+#define AVDD                 3 //2.44
 
 /* Define preprocessor variables */
 #define ADC_full_range       0x7FFFFF
@@ -64,10 +64,10 @@ uint8_t pulses=0, rate=0, gain=128;
 uint16_t full_scale=0;
 uint32_t Data=0, value=0;
 uint8_t global_ch, global_port, global_module, mode, unit;
-uint32_t global_period, global_timeout, t0;
+uint32_t global_period, global_timeout;
 float weight1_buffer, weight2_buffer; float *ptr_weight_buffer;
 float valuef = 0.0f, rawvalue=0.0f;
-float calibration_factor=0.0f;
+float calibration_factor=0.0f, Zero_Drift=0.0f;
 static float cell_output=0.0;
 static float cell_drift=0.00002;
 static float weight=0.0f;
@@ -75,18 +75,22 @@ float DATA_To_SEND=0.0f;
 bool Current_pin_state=0;
 float weightGram=0.0f, weightKGram=0.0f, weightOunce=0.0f, weightPound=0.0f;
 float w=0.0f;
+float Sample[256]={0.0};
 TaskHandle_t LoadcellHandle = NULL;
+TimerHandle_t xTimer = NULL;
 uint8_t startMeasurementRanging = STOP_MEASUREMENT_RANGING;
 
 /* Private function prototypes -----------------------------------------------*/	
-void readHX711(void);
+float readHX711(void);
 float weightCalculation(void);
-void SendResults(float message, uint8_t Mode, uint8_t unit, uint8_t Port, uint8_t Module, float *Buffer);
+int SendResults(float message, uint8_t Mode, uint8_t unit, uint8_t Port, uint8_t Module, float *Buffer);
 void LoadcellTask(void * argument);
 void TimerTask(void * argument);
 static void CheckForEnterKey(void);
+static void HandleTimeout(TimerHandle_t xTimer);
 
 /* Create CLI commands --------------------------------------------------------*/
+static portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
@@ -243,7 +247,7 @@ uint8_t GetPort(UART_HandleTypeDef *huart)
 
 /*-----------------------------------------------------------*/
 //read value from HX711
-void readHX711(void)
+float readHX711(void)
 {
 	uint8_t j=0;
 	//wait until HX711 becomes ready
@@ -267,6 +271,7 @@ void readHX711(void)
 		}
 		value=Data;
 		Data=0;
+		portEXIT_CRITICAL();
 		//check if the Twosvalue is positive or negative
 		if(value>ADC_full_range)
 		{
@@ -278,7 +283,7 @@ void readHX711(void)
 		{
 			valuef=(float)value;
 		}
-		portEXIT_CRITICAL();	
+	return (valuef);		
 }
  
 /*-----------------------------------------------------------*/
@@ -286,7 +291,7 @@ void readHX711(void)
 //calculate the weight
 float weightCalculation(void)
 {
-	rawvalue=(valuef*0.5*AVDD)/(ADC_full_range*gain) + cell_drift - IC_drift;  //+0.000022;
+	rawvalue=(valuef*0.5*AVDD)/(ADC_full_range*gain) + cell_drift - IC_drift - Zero_Drift;  //+0.000022;
 	weight=(rawvalue*full_scale)/calibration_factor;
 	return(weight);	
 }
@@ -869,21 +874,21 @@ float Average(uint8_t ch, uint8_t samples)
 {
 	uint8_t N=samples;
 	uint8_t i=0;
-	uint8_t j=0;
-	float Sample[256]={0.0};
+	uint8_t ii=0;
 	float average=0.0;
+	PowerOn();
 	SetHX711Gain(ch);
 	for(i=0; i<=N; i++)
 		{
-		readHX711();
-		if (i==1)
+		readHX711();	
+		if (i>=1)
 			{
 				Sample[i]=valuef;
 			}
 		}
-	for (j=0; j<N; j++)
+	for (ii=0; ii<N; ii++)
 	{
-		average+=Sample[j+1];
+		average+=Sample[ii+1];
 	}
 	average/=N;
 	return(average);
@@ -891,22 +896,36 @@ float Average(uint8_t ch, uint8_t samples)
 
 /*-----------------------------------------------------------*/
 
-//HX711 Power Down
-void PowerDown(void)
+//Perform zero weight calibration on the load cell
+int ZeroCal(uint8_t Ch)
 {
-//make PD_SCK pin high
-	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_SET);
+uint8_t ch;
+	ch=Ch;
+	Zero_Drift=(Average(ch,10)*0.5*AVDD)/(ADC_full_range*gain);
 	
+		return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
 //HX711 Power Down
-void PowerOn(void)
+int PowerDown(void)
+{
+//make PD_SCK pin high
+	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_SET);
+	
+		return (H26R0_OK);
+}
+
+/*-----------------------------------------------------------*/
+
+//HX711 Power On
+int PowerOn(void)
 {
 //make PD_SCK pin high
 	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
 	
+		return (H26R0_OK);
 }
 
 
