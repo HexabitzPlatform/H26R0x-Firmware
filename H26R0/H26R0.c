@@ -32,8 +32,10 @@ UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart6;
 
 /* Module exported parameters ------------------------------------------------*/
-float h08r6_range = 0.0f;
-module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h08r6_range, .paramFormat=FMT_FLOAT, .paramName="weight"}};
+float h26r0_weight1 = 0.0f;
+float h26r0_weight2 = 0.0f;
+module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h26r0_weight1, .paramFormat=FMT_FLOAT, .paramName="weight1"} ,
+{.paramPtr=&h26r0_weight2, .paramFormat=FMT_FLOAT, .paramName="weight2"}};
 
 /* Private variables ---------------------------------------------------------*/
 /* Define HX711 pins */
