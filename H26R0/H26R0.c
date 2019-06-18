@@ -498,6 +498,7 @@ static void CheckForEnterKey(void)
   {
     startMeasurementRanging = STOP_MEASUREMENT_RANGING;
 		mode = IDLE_CASE;		// Stop the streaming task
+	  xTimerStop( xTimer, 0 );
   }
 }
 
@@ -1056,7 +1057,6 @@ static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to i
   uint8_t port = 0;
   uint8_t module = 0;
 	uint8_t channel = 1;
-	float *buffer;
   Module_Status result = H26R0_OK;
 
   /* Remove compile time warnings about unused parameters, and check the
@@ -1169,7 +1169,10 @@ static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 {
 	mode=IDLE_CASE;
   PowerDown();
-  return 0;	
+	xTimerStop( xTimer, 0 );
+	weight1_buffer=0;
+	weight2_buffer=0;
+  return H26R0_OK;	
 }
 
 static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
@@ -1224,7 +1227,7 @@ static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 
 static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
-	Module_Status result = H26R0_OK;
+	//Module_Status result = H26R0_OK;
   int8_t *pcParameterString1;
   portBASE_TYPE xParameterStringLength1 = 0;
   static const int8_t *pcMessageWrongParam = ( int8_t * ) "Wrong parameter!\r\n";
@@ -1247,6 +1250,10 @@ static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
     rate = 80;      // 80SPS
     strcpy( ( char * ) pcWriteBuffer, ( char * ) "Used measurement rate: 80\r\n" );
   }
+	else
+	{
+		strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageWrongParam );
+	}
 	SetHX711Rate(rate);
 	return 0;	
 }
