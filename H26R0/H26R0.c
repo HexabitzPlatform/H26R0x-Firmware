@@ -667,7 +667,7 @@ int StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, 
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Gram;
-	TimerHandle_t xTimer = NULL;
+	//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -691,7 +691,7 @@ int StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=KGram;
-		TimerHandle_t xTimer = NULL;
+		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -715,7 +715,7 @@ int StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Ounce;
-		TimerHandle_t xTimer = NULL;
+	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -739,7 +739,7 @@ int StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Pound;
-		TimerHandle_t xTimer = NULL;
+		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -816,7 +816,7 @@ int StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Time
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Gram;
-		TimerHandle_t xTimer = NULL;
+	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -840,7 +840,7 @@ int StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=KGram;
-		TimerHandle_t xTimer = NULL;
+	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -864,7 +864,7 @@ int StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Ounce;
-		TimerHandle_t xTimer = NULL;
+	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -888,7 +888,7 @@ int StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Pound;
-		TimerHandle_t xTimer = NULL;
+	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
