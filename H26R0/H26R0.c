@@ -1068,10 +1068,11 @@ static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 
 static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
-static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to internal buffer. Access in the CLI using module parameter: weight\n\r";
+	static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to internal buffer. Access in the CLI using module parameters: weight1 or weight2\n\r";
 	static const int8_t *pcMessageModule = ( int8_t * ) "Streaming measurements to port P%d in module #%d\n\r";
 	static const int8_t *pcMessageCLI = ( int8_t * ) "Streaming measurements to the CLI\n\n\r";
 	static const int8_t *pcMessageError = ( int8_t * ) "Wrong parameter\r\n";
+	static const int8_t *pcMessageWrongName = ( int8_t * ) "Wrong module name\r\n";
   int8_t *pcParameterString1; /* ch */
 	int8_t *pcParameterString2; /* period */
   int8_t *pcParameterString3; /* timeout */
@@ -1176,7 +1177,7 @@ static const int8_t *pcMessageBuffer = ( int8_t * ) "Streaming measurements to i
 			StreamKGramToCLI(channel, period, timeout);
 		}		
 		/* Wait till the end of stream */
-		while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){};
+		while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){taskYIELD();}
 		/* clean terminal output */
 		memset((char *) pcWriteBuffer, 0, strlen((char *)pcWriteBuffer));
 	}		
