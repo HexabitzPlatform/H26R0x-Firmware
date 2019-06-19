@@ -210,7 +210,6 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 	Module_Status result = H26R0_OK;
   uint32_t period = 0;
   uint32_t timeout = 0;
-	//TimerHandle_t xTimer = NULL;
 	
 	switch (code)
 	{
@@ -350,7 +349,6 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
   //static const int8_t *pcOutMaxRange = ( int8_t * ) "MAX\r\n";
 	//static const int8_t *pcOutTimeout = ( int8_t * ) "TIMEOUT\r\n";
   char *strUnit;
-	//char * Msg_To_Send[100];
   //specify the unit
 	switch (unit)
 	{
@@ -464,7 +462,6 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 				writePxITMutex(Port, (char *)&Raw_Msg, sizeof(Raw_Msg), 10);
 		}
 		else{
-			//Raw_Msg=123.4;
 		    messageParams[0]=Port;
 			  memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
 			  SendMessageToModule(Module, CODE_port_forward, sizeof(float)+1);
@@ -529,8 +526,8 @@ static void CheckForEnterKey(void)
   if ('\r' == pcOutputString[0])
   {
     startMeasurementRanging = STOP_MEASUREMENT_RANGING;
-		mode = IDLE_CASE;		// Stop the streaming task
-	  xTimerStop( xTimer, 0 );
+		mode = IDLE_CASE;		     // Stop the streaming task
+	  xTimerStop( xTimer, 0 );            // Stop the timeout timer
   }
 }
 
@@ -554,20 +551,21 @@ void LoadcellTask(void * argument)
 				case STREAM_VERBOSE_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
+				SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-					SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
 		  break;
 			case STREAM_PORT_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
+				SendResults(DATA_To_SEND, mode, unit, global_port, global_module, NULL);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-					SendResults(DATA_To_SEND, mode, unit, global_port, global_module, NULL);
 		  break;
 			case STREAM_BUFFER_CASE: 
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
+				SendResults(DATA_To_SEND, unit, mode, 0, 0, ptr_weight_buffer);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-				SendResults(DATA_To_SEND, unit, mode, 0, 0, ptr_weight_buffer); break;
+			break;
 			default: mode = IDLE_CASE; break;
 		}
 		
@@ -700,7 +698,6 @@ int StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, 
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Gram;
-	//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -724,7 +721,6 @@ int StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=KGram;
-		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -748,7 +744,6 @@ int StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Ounce;
-	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -772,7 +767,6 @@ int StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Pound;
-		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -793,8 +787,6 @@ int StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 	global_period=Period;
 	global_timeout=Timeout;
 	mode=STREAM_CLI_CASE;
-	//unit=KGram;
-		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -821,8 +813,6 @@ int StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 	global_period=Period;
 	global_timeout=Timeout;
 	mode=STREAM_VERBOSE_CASE;
-	//unit=KGram;
-		//TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -849,7 +839,6 @@ int StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Time
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Gram;
-	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -873,7 +862,6 @@ int StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=KGram;
-	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -897,7 +885,6 @@ int StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Ounce;
-	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -921,7 +908,6 @@ int StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Pound;
-	//	TimerHandle_t xTimer = NULL;
 	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -966,7 +952,7 @@ float Average(uint8_t ch, uint8_t samples)
 //Perform zero weight calibration on the load cell
 int ZeroCal(uint8_t Ch)
 {
-uint8_t ch;
+	uint8_t ch;
 	ch=Ch;
 	Zero_Drift=(Average(ch,10)*0.5*AVDD)/(ADC_full_range*gain);
 	
@@ -1174,14 +1160,20 @@ static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 		if (NULL != pcParameterString4 && !strncmp((const char *)pcParameterString4, "-v", 2)) {
 			StreamKGramToVERBOSE(channel, period, timeout);
 		} else {
+			if (channel == 1 || channel == 2)
+			{
 			strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageCLI);
 			writePxMutex(PcPort, (char *)pcWriteBuffer, strlen((char *)pcWriteBuffer), cmd50ms, HAL_MAX_DELAY);
 			StreamKGramToCLI(channel, period, timeout);
-		}		
-		/* Wait till the end of stream */
+						/* Wait till the end of stream */
 		while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){taskYIELD();}
 		/* clean terminal output */
 		memset((char *) pcWriteBuffer, 0, strlen((char *)pcWriteBuffer));
+			}
+			else
+				 strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageError);
+		}		
+
 	}		
 	else 
 	{
