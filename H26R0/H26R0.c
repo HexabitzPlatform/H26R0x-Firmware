@@ -98,6 +98,8 @@ static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE calibrationCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
+static portBASE_TYPE zerocalCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE weight1ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE weight2ModParamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 
@@ -152,6 +154,25 @@ const CLI_Command_Definition_t rateCommandDefinition =
   ( const int8_t * ) "rate", /* The command string to type. */
   ( const int8_t * ) "(H26R0) rate:\r\n Set HX711 measurement rate in sample per second (10, 80)\r\n\r\n",
   rateCommand, /* The function to run. */
+  1 /* one parameter is expected. */
+};
+
+
+/* CLI command structure : calibration */
+const CLI_Command_Definition_t calibrationCommandDefinition =
+{
+  ( const int8_t * ) "calibration", /* The command string to type. */
+  ( const int8_t * ) "(H26R0) calibration:\r\n Set load cell calibration values\r\n\r\n",
+  calibrationCommand, /* The function to run. */
+  3 /* three parameters are expected. */
+};
+
+/* CLI command structure : zerocal */
+const CLI_Command_Definition_t zerocalCommandDefinition =
+{
+  ( const int8_t * ) "zerocal", /* The command string to type. */
+  ( const int8_t * ) "(H26R0) zerocal:\r\n Choose the channel to make zero calibration for the load cell\r\n\r\n",
+  zerocalCommand, /* The function to run. */
   1 /* one parameter is expected. */
 };
 
@@ -285,6 +306,8 @@ void RegisterModuleCLICommands(void)
 	FreeRTOS_CLIRegisterCommand( &stopCommandDefinition);
 	FreeRTOS_CLIRegisterCommand( &unitCommandDefinition);
 	FreeRTOS_CLIRegisterCommand( &rateCommandDefinition);
+	FreeRTOS_CLIRegisterCommand( &calibrationCommandDefinition);
+	FreeRTOS_CLIRegisterCommand( &zerocalCommandDefinition);
 	FreeRTOS_CLIRegisterCommand( &weight1CommandDefinition);
 	FreeRTOS_CLIRegisterCommand( &weight2CommandDefinition);
 }
@@ -1304,6 +1327,104 @@ static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 		strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageWrongParam );
 	}
 	SetHX711Rate(rate);
+	return 0;	
+}
+
+static portBASE_TYPE calibrationCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
+{
+	Module_Status result = H26R0_OK;
+  int8_t *pcParameterString1;
+	int8_t *pcParameterString2;
+	int8_t *pcParameterString3;
+  portBASE_TYPE xParameterStringLength1 = 0;
+	portBASE_TYPE xParameterStringLength2 = 0;
+	portBASE_TYPE xParameterStringLength3 = 0;
+  static const int8_t *pcMessage = ( int8_t * ) "Calibrating the load cell parameters!\r\n";
+	static const int8_t *pcMessageWrongParam = ( int8_t * ) "Wrong parameter!\r\n";
+	uint16_t load_cell_scale=0;
+	float load_cell_output=0.0f;
+	float load_cell_drift=0.0f;
+
+  /* Remove compile time warnings about unused parameters, and check the
+  write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+  write buffer length is adequate, so does not check for buffer overflows. */
+  ( void ) xWriteBufferLen;
+  configASSERT( pcWriteBuffer );
+
+  /* 1st parameter for the full scale of the load cell */
+  pcParameterString1 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 1, &xParameterStringLength1);
+	/* 2nd parameter for the output of the load cell */
+  pcParameterString2 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 2, &xParameterStringLength2);
+	/* 3rd parameter for the drift of the load cell */
+  pcParameterString2 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 3, &xParameterStringLength3);
+	
+  if (NULL != pcParameterString1)
+  {
+    load_cell_scale = atoi( (char *)pcParameterString1);
+  }
+  else
+  {
+    result = H26R0_ERR_WrongParams;
+  }
+	if (NULL != pcParameterString2)
+  {
+    load_cell_output = atof( (char *)pcParameterString2);
+  }
+  else
+  {
+    result = H26R0_ERR_WrongParams;
+  }
+  if (NULL != pcParameterString3)
+  {
+      load_cell_drift = atof( (char *)pcParameterString3);
+  }
+	else
+	{
+		result = H26R0_ERR_WrongParams;
+	}
+	
+	  /* Respond to the command */
+  if (H26R0_ERR_WrongParams == result)
+  {
+    strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageWrongParam );
+  }
+	// execute the the calibation API
+	strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessage);
+	Calibration(load_cell_scale, load_cell_output, load_cell_drift);
+	return H26R0_OK;	
+}
+
+static portBASE_TYPE zerocalCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
+{
+	//Module_Status result = H26R0_OK;
+	uint8_t channel;
+  int8_t *pcParameterString1;
+  portBASE_TYPE xParameterStringLength1 = 0;
+  static const int8_t *pcMessageWrongParam = ( int8_t * ) "Wrong parameter!\r\n";
+
+  /* Remove compile time warnings about unused parameters, and check the
+  write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+  write buffer length is adequate, so does not check for buffer overflows. */
+  ( void ) xWriteBufferLen;
+  configASSERT( pcWriteBuffer );
+
+  /* 1st parameter for naming of uart port: P1 to P6 */
+  pcParameterString1 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 1, &xParameterStringLength1);
+  if (!strncmp((const char *)pcParameterString1, "1", 1))
+  {
+    channel=1;
+    strcpy( ( char * ) pcWriteBuffer, ( char * ) "Zero calibration for channel 1\r\n" );
+  }
+  else if (!strncmp((const char *)pcParameterString1, "2", 1))
+  {
+    channel=2;
+    strcpy( ( char * ) pcWriteBuffer, ( char * ) "Zero calibration for channel 2\r\n" );
+  }
+	else
+	{
+		strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageWrongParam );
+	}
+	ZeroCal(channel);
 	return 0;	
 }
 
