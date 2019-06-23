@@ -235,56 +235,66 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 	{
 		case (CODE_H26R0_SET_RATE):
 			SetHX711Rate(cMessage[port-1][4]);
-		break;
+			break;
+		
 		case (CODE_H26R0_STREAM_PORT_GRAM):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
 			StreamGramToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
-		break;
+			break;
+		
 		case (CODE_H26R0_STREAM_PORT_KGRAM):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
 			StreamKGramToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
-		break;
-      case (CODE_H26R0_STREAM_PORT_OUNCE):
+			break;
+		
+    case (CODE_H26R0_STREAM_PORT_OUNCE):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
 			StreamOunceToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
 			break;
+		
 		case (CODE_H26R0_STREAM_PORT_POUND):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
 			StreamPoundToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
-		break;
+			break;
+		
 		case (CODE_H26R0_STOP):
 			mode=IDLE_CASE;
 			PowerDown();
 			xTimerStop( xTimer, portMAX_DELAY );
-		break;
+			break;
+		
 		case (CODE_H26R0_SAMPLE_GRAM):
 			if (cMessage[port-1][4] == 1)
-			h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				h26r0_weight1=SampleGram(cMessage[port-1][4]);
 			else
-			h26r0_weight2=SampleGram(cMessage[port-1][4]);	
-		break;
-			case (CODE_H26R0_SAMPLE_KGRAM):
+				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+			break;
+			
+		case (CODE_H26R0_SAMPLE_KGRAM):
 			if (cMessage[port-1][4] == 1)
-			h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				h26r0_weight1=SampleGram(cMessage[port-1][4]);
 			else
-			h26r0_weight2=SampleGram(cMessage[port-1][4]);	
-		break;
-			case (CODE_H26R0_SAMPLE_OUNCE):
+				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+			break;
+			
+		case (CODE_H26R0_SAMPLE_OUNCE):
 			if (cMessage[port-1][4] == 1)
-			h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				h26r0_weight1=SampleGram(cMessage[port-1][4]);
 			else
-			h26r0_weight2=SampleGram(cMessage[port-1][4]);	
-		break;
-			case (CODE_H26R0_SAMPLE_POUND):
+				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+			break;
+			
+		case (CODE_H26R0_SAMPLE_POUND):
 			if (cMessage[port-1][4] == 1)
-			h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				h26r0_weight1=SampleGram(cMessage[port-1][4]);
 			else
-			h26r0_weight2=SampleGram(cMessage[port-1][4]);	
-		break;
+				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+			break;
+			
 		default:
 			result = H26R0_ERR_UnknownMessage;
 			break;
@@ -338,6 +348,7 @@ float readHX711(void)
 	uint8_t j=0;
 	//wait until HX711 becomes ready
 	while(HAL_GPIO_ReadPin(GPIOA,DOUT)==1){	}
+	
 	portENTER_CRITICAL();
 		for (j=0; j<pulses; j++)
 		{
@@ -357,24 +368,26 @@ float readHX711(void)
 		}
 		value=Data;
 		Data=0;
-		portEXIT_CRITICAL();
-		//check if the Twosvalue is positive or negative
-		if(value>ADC_full_range)
-		{
-			value=(~value&0x00FFFFFF);
-			value+=1;        // the output of the ADC
-			valuef=-(float)value;
-		}
-		else
-		{
-			valuef=(float)value;
-		}
+	portEXIT_CRITICAL();
+		
+	//check if the Twosvalue is positive or negative
+	if(value>ADC_full_range)
+	{
+		value=(~value&0x00FFFFFF);
+		value+=1;        // the output of the ADC
+		valuef=-(float)value;
+	}
+	else
+	{
+		valuef=(float)value;
+	}
 	return (valuef);		
 }
  
 /*-----------------------------------------------------------*/
 
-//calculate the weight
+/* --- calculate the weight
+*/
 float weightCalculation(void)
 {
 	rawvalue=(valuef*0.5*AVDD)/(ADC_full_range*gain) + cell_drift - IC_drift - Zero_Drift;  //+0.000022;
@@ -384,7 +397,8 @@ float weightCalculation(void)
  
 /*-----------------------------------------------------------*/
 
-//send results to x
+/* --- send results to x
+*/
 int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t Module, float *Buffer)
 {
 	float Raw_Msg=0.0f;
@@ -436,7 +450,6 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		else
 		{
 			sprintf( ( char * ) strUnit, "Kg");
-			/* nothing to do here */
 		}
 	}
 
@@ -504,14 +517,14 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		
     case SAMPLE_PORT_CASE:
     case STREAM_PORT_CASE:
-		if (Module==myID){
-				writePxITMutex(Port, (char *)&Raw_Msg, sizeof(Raw_Msg), 10);
-		}
-		else{
-		    messageParams[0]=Port;
-			  memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
-			  SendMessageToModule(Module, CODE_port_forward, sizeof(float)+1);
-		}
+			if (Module==myID){
+					writePxITMutex(Port, (char *)&Raw_Msg, sizeof(Raw_Msg), 10);
+			}
+			else{
+					messageParams[0]=Port;
+					memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
+					SendMessageToModule(Module, CODE_port_forward, sizeof(float)+1);
+			}
       break;
 		
     case SAMPLE_BUFFER_CASE:
@@ -561,8 +574,10 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 	return (H26R0_OK);
 }
 
-/* --- Check for CLI stop key*/
+/*-----------------------------------------------------------*/
 
+/* ---  Check for CLI stop key
+*/
 static void CheckForEnterKey(void)
 {
   int8_t *pcOutputString;
@@ -580,7 +595,8 @@ static void CheckForEnterKey(void)
 
 /*-----------------------------------------------------------*/
 
-//load cell stream task
+/* --- load cell stream task
+*/
 void LoadcellTask(void * argument)
 {
 	uint32_t t0=0;
@@ -593,25 +609,29 @@ void LoadcellTask(void * argument)
 				DATA_To_SEND=SampleKGram(global_ch);		
 				SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
 				while(HAL_GetTick()-t0<(global_period-1)) {taskYIELD();}
-		  break;
-				case STREAM_VERBOSE_CASE:
+				break;
+				
+			case STREAM_VERBOSE_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
 				SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-		  break;
+				break;
+				
 			case STREAM_PORT_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
 				SendResults(DATA_To_SEND, mode, unit, global_port, global_module, NULL);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-		  break;
+				break;
+				
 			case STREAM_BUFFER_CASE: 
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
 				SendResults(DATA_To_SEND, unit, mode, 0, 0, ptr_weight_buffer);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
-			break;
+				break;
+				
 			default: mode = IDLE_CASE; break;
 		}
 		
@@ -621,12 +641,13 @@ void LoadcellTask(void * argument)
 
 /*-----------------------------------------------------------*/
 
-//software timer callback function
+/* --- software timer callback function
+*/
 static void HandleTimeout(TimerHandle_t xTimer)
 {
   uint32_t tid = 0;
 
-  /* close DMA stream */
+  /* Get Timer ID */
   tid = ( uint32_t ) pvTimerGetTimerID( xTimer );
   if (TIMERID_TIMEOUT_MEASUREMENT == tid)
   {
@@ -634,11 +655,14 @@ static void HandleTimeout(TimerHandle_t xTimer)
 		startMeasurementRanging = STOP_MEASUREMENT_RANGING;     // stop streaming
   }
 }
+
 /* -----------------------------------------------------------------------
 	|																APIs	 																 	|
    ----------------------------------------------------------------------- 
 */
-//set HX711 Rate sample per second
+
+/* --- set HX711 Rate sample per second
+*/
 void SetHX711Rate(uint8_t Data_Rate)
 {
 	//make PD_SCK pin zero
@@ -655,7 +679,8 @@ void SetHX711Rate(uint8_t Data_Rate)
 
 /*-----------------------------------------------------------*/
 
-//Set the gain factor of the used channel
+/* --- Set the gain factor of the used channel
+*/
 void SetHX711Gain(uint8_t ch)
 {
 	//determine the chanel and the gain factor
@@ -670,7 +695,8 @@ void SetHX711Gain(uint8_t ch)
 
 /*-----------------------------------------------------------*/
 
-//enter the calibration values of the load cell
+/* --- enter the calibration values of the load cell
+*/
 float Calibration(uint16_t Full_Scale,float Cell_Output,float Cell_Drift)
 {
 	cell_output=Cell_Output;
@@ -682,7 +708,8 @@ float Calibration(uint16_t Full_Scale,float Cell_Output,float Cell_Drift)
 
 /*-----------------------------------------------------------*/
 
-//read weight value from channel ch of HX711 and return weight in Gram
+/* --- read weight value from channel ch of HX711 and return weight in Gram
+*/
 float SampleGram(uint8_t ch)
 {
 	uint8_t i=0;
@@ -695,7 +722,8 @@ float SampleGram(uint8_t ch)
 
 /*-----------------------------------------------------------*/
 
-//read weight value from channel ch of HX711 and return weight in KGram
+/* --- read weight value from channel ch of HX711 and return weight in KGram
+*/
 float SampleKGram(uint8_t ch)
 {
 	uint8_t i=0;
@@ -708,7 +736,8 @@ float SampleKGram(uint8_t ch)
 
 /*-----------------------------------------------------------*/
 
-//read weight value from channel ch of HX711 and return weight in Ounce
+/* --- read weight value from channel ch of HX711 and return weight in Ounce
+*/
 float SampleOunce(uint8_t ch)
 {
 	uint8_t i=0;
@@ -721,7 +750,8 @@ float SampleOunce(uint8_t ch)
 
 /*-----------------------------------------------------------*/
 
-//read weight value from channel ch of HX711 and return weight in Pound
+/* --- read weight value from channel ch of HX711 and return weight in Pound
+*/
 float SamplePound(uint8_t ch)
 {
 	uint8_t i=0;
@@ -734,7 +764,8 @@ float SamplePound(uint8_t ch)
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to port
+/* --- stream weightvalue from channel ch to port
+*/
 int StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -744,20 +775,21 @@ int StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, 
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Gram;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
-		return (H26R0_OK);
+	return (H26R0_OK);
 }	
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to port
+/* --- stream weightvalue from channel ch to port
+*/
 int StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -767,20 +799,21 @@ int StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=KGram;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to port
+/* --- stream weightvalue from channel ch to port
+*/
 int StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -790,20 +823,21 @@ int StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Ounce;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to port
+/* --- stream weightvalue from channel ch to port
+*/
 int StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -813,70 +847,73 @@ int StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_timeout=Timeout;
 	mode=STREAM_PORT_CASE;
 	unit=Pound;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to CLI
+/* --- stream weightvalue from channel ch to CLI
+*/
 int StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
 	mode=STREAM_CLI_CASE;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
-	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* start software timer which will create event timeout */
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
 	if (global_timeout > 0)
 	{
-	startMeasurementRanging = START_MEASUREMENT_RANGING;
+		startMeasurementRanging = START_MEASUREMENT_RANGING;
 	}
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to CLI
+/* --- stream weightvalue from channel ch to CLI
+*/
 int StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
 	mode=STREAM_VERBOSE_CASE;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
 	if (global_timeout > 0)
 	{
-	startMeasurementRanging = START_MEASUREMENT_RANGING;
+		startMeasurementRanging = START_MEASUREMENT_RANGING;
 	}
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to buffer
+/* --- stream weightvalue from channel ch to buffer
+*/
 int StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -885,21 +922,22 @@ int StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Time
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Gram;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to buffer
+/* --- stream weightvalue from channel ch to buffer
+*/
 int StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -908,21 +946,22 @@ int StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=KGram;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to buffer
+/* --- stream weightvalue from channel ch to buffer
+*/
 int StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -931,21 +970,22 @@ int StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Ounce;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//stream weightvalue from channel ch to buffer
+/* --- stream weightvalue from channel ch to buffer
+*/
 int StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Timeout)
 {
 	global_ch=Ch;
@@ -954,21 +994,22 @@ int StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	ptr_weight_buffer=Buffer;
 	mode=STREAM_BUFFER_CASE;
 	unit=Pound;
-	  if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
+	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
-  /* Create a timeout timer */
-  xTimer = xTimerCreate( "Timeout Measurement", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
-  /* Start the timeout timer */
-  xTimerStart( xTimer, portMAX_DELAY );
+		/* Create a timeout timer */
+		xTimer = xTimerCreate( "Measurement Timeout", pdMS_TO_TICKS(global_timeout), pdFALSE, ( void * ) TIMERID_TIMEOUT_MEASUREMENT, HandleTimeout );
+		/* Start the timeout timer */
+		xTimerStart( xTimer, portMAX_DELAY );
 	}
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//take the average of samples from channel ch
+/* --- take the average of samples from channel ch
+*/
 float Average(uint8_t ch, uint8_t samples)
 {
 	uint8_t N=samples;
@@ -978,13 +1019,13 @@ float Average(uint8_t ch, uint8_t samples)
 	PowerOn();
 	SetHX711Gain(ch);
 	for(i=0; i<=N; i++)
-		{
+	{
 		readHX711();	
 		if (i>=1)
-			{
-				Sample[i]=valuef;
-			}
+		{
+			Sample[i]=valuef;
 		}
+	}
 	for (ii=0; ii<N; ii++)
 	{
 		average+=Sample[ii+1];
@@ -995,38 +1036,40 @@ float Average(uint8_t ch, uint8_t samples)
 
 /*-----------------------------------------------------------*/
 
-//Perform zero weight calibration on the load cell
+/* --- Perform zero weight calibration on the load cell
+*/
 int ZeroCal(uint8_t Ch)
 {
 	uint8_t ch;
 	ch=Ch;
 	Zero_Drift=(Average(ch,10)*0.5*AVDD)/(ADC_full_range*gain);
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//HX711 Power Down
+/* --- HX711 Power Down
+*/
 int PowerDown(void)
 {
-//make PD_SCK pin high
+	//make PD_SCK pin high
 	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_SET);
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
 
 /*-----------------------------------------------------------*/
 
-//HX711 Power On
+/* --- HX711 Power On
+*/
 int PowerOn(void)
 {
-//make PD_SCK pin high
+	//make PD_SCK pin high
 	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
 	
-		return (H26R0_OK);
+	return (H26R0_OK);
 }
-
 
 /*-----------------------------------------------------------*/
 
@@ -1131,6 +1174,8 @@ static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
   /* There is no more data to return after this single string, so return pdFALSE. */
   return pdFALSE;	
 }
+
+/*-----------------------------------------------------------*/
 
 static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
@@ -1268,6 +1313,8 @@ static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 
 }
 
+/*-----------------------------------------------------------*/
+
 static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
 	mode=IDLE_CASE;
@@ -1277,6 +1324,8 @@ static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 	weight2_buffer=0;
   return H26R0_OK;	
 }
+
+/*-----------------------------------------------------------*/
 
 static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
@@ -1328,6 +1377,8 @@ static portBASE_TYPE unitCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
   return pdFALSE;
 }
 
+/*-----------------------------------------------------------*/
+
 static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
 	//Module_Status result = H26R0_OK;
@@ -1360,6 +1411,8 @@ static portBASE_TYPE rateCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen,
 	SetHX711Rate(rate);
 	return 0;	
 }
+
+/*-----------------------------------------------------------*/
 
 static portBASE_TYPE calibrationCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
@@ -1424,6 +1477,8 @@ static portBASE_TYPE calibrationCommand( int8_t *pcWriteBuffer, size_t xWriteBuf
 	Calibration(load_cell_scale, load_cell_output, load_cell_drift);
 	return H26R0_OK;	
 }
+
+/*-----------------------------------------------------------*/
 
 static portBASE_TYPE zerocalCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
