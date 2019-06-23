@@ -76,7 +76,6 @@ static float weight=0.0f;
 float DATA_To_SEND=0.0f;
 bool Current_pin_state=0;
 float weightGram=0.0f, weightKGram=0.0f, weightOunce=0.0f, weightPound=0.0f;
-float w=0.0f;
 float Sample[256]={0.0};
 TaskHandle_t LoadcellHandle = NULL;
 TimerHandle_t xTimer = NULL;
@@ -162,7 +161,7 @@ const CLI_Command_Definition_t rateCommandDefinition =
 const CLI_Command_Definition_t calibrationCommandDefinition =
 {
   ( const int8_t * ) "calibration", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) calibration:\r\n Set load cell calibration values\r\n\r\n",
+		( const int8_t * ) "(H26R0) calibration:\r\n Set load cell calibration values: (1st) full scale in Kg, (2nd) cell output in mV, (3rd) cell drift in mV\r\n\r\n",
   calibrationCommand, /* The function to run. */
   3 /* three parameters are expected. */
 };
@@ -1039,9 +1038,10 @@ int PowerOn(void)
 portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
 	static const int8_t *pcMessage = ( int8_t * ) "Streaming weight measurements at 2 Hz for 10 seconds\r\n";
+	static const int8_t *pcMessageError = ( int8_t * ) "Wrong parameter\r\n";
 	int8_t *pcParameterString1; /* ch */
 	portBASE_TYPE xParameterStringLength1 = 0;
-	uint8_t channel = 1;
+	uint8_t channel = 0;
 	Module_Status result = H26R0_OK;
 	
 	/* Remove compile time warnings about unused parameters, and check the
@@ -1064,12 +1064,19 @@ portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const 
   }
 	
 	/* Respond to the command */
-	strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessage);
-	writePxMutex(PcPort, (char *)pcWriteBuffer, strlen((char *)pcWriteBuffer), cmd50ms, HAL_MAX_DELAY);
-	StreamKGramToCLI(channel, 500, 10000);
+		if (channel == 1 || channel == 2)
+	{
+			strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessage);
+		writePxMutex(PcPort, (char *)pcWriteBuffer, strlen((char *)pcWriteBuffer), cmd50ms, HAL_MAX_DELAY);
+		StreamKGramToCLI(channel, 500, 10000);
+		/* Wait till the end of stream */
+		while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){};
+	}
 	
-	/* Wait till the end of stream */
-	while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){};
+	if (result != H26R0_OK || channel != 1 || channel != 2){
+		strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageError);
+	}
+
 	/* clean terminal output */
 	memset((char *) pcWriteBuffer, 0, strlen((char *)pcWriteBuffer));
 			
@@ -1082,6 +1089,12 @@ portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const 
 
 static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
+	static const int8_t *pcMessageError = ( int8_t * ) "Wrong parameter\r\n";
+	int8_t *pcParameterString1; /* ch */
+	portBASE_TYPE xParameterStringLength1 = 0;
+	uint8_t channel = 0;
+	Module_Status result = H26R0_OK;
+	
 	/* Remove compile time warnings about unused parameters, and check the
   write buffer is not NULL.  NOTE - for simplicity, this example assumes the
   write buffer length is adequate, so does not check for buffer overflows. */
@@ -1089,10 +1102,28 @@ static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
   ( void ) xWriteBufferLen;
   configASSERT( pcWriteBuffer );
 	
-	DATA_To_SEND=SampleKGram(global_ch);
-	mode=SAMPLE_CLI_CASE;
-	SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+	  /* Obtain the 1st parameter string: channel */
+  pcParameterString1 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 1, &xParameterStringLength1);
 
+  if (NULL != pcParameterString1)
+  {
+    channel = atoi( (char *)pcParameterString1);
+  }
+  else
+  {
+    result = H26R0_ERR_WrongParams;
+  }
+	
+	if (channel == 1 || channel == 2)
+	{
+		DATA_To_SEND=SampleKGram(channel);
+		mode=SAMPLE_CLI_CASE;
+		SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+	}
+	
+		if (result != H26R0_OK || channel != 1 || channel != 2 )
+		strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageError);
+		
 	//strcpy( ( char * ) pcWriteBuffer, ( char * ) "Weight: \r\n" );
   /* clean terminal output */
   memset((char *) pcWriteBuffer, 0, configCOMMAND_INT_MAX_OUTPUT_SIZE);

@@ -41,7 +41,6 @@
 
 
 /* Private variables ---------------------------------------------------------*/
-float wei=0.0;
 float weight=0.0;
 varFormat_t format1;
 
@@ -109,8 +108,12 @@ void UserTask(void * argument)
   /* Infinite loop */
   for(;;)
   {
+		messageParams[0]=1;
+		SendMessageToModule(2, CODE_H26R0_SAMPLE_GRAM, 1);
+		Delay_ms(100);
 		weight= *(float *)ReadRemoteParam(2, "weight1", &format1, 1000);
-		Delay_ms(500);
+		//weight=SampleKGram(1);
+		Delay_ms(1000);
 		
 		
 	}
