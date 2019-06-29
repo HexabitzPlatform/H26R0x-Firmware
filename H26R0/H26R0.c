@@ -1246,7 +1246,17 @@ static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 
 static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
- Stop();
+	
+  /* Remove compile time warnings about unused parameters, and check the
+  write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+  write buffer length is adequate, so does not check for buffer overflows. */
+  ( void ) xWriteBufferLen;
+  configASSERT( pcWriteBuffer );
+	
+	Stop();
+	
+	/* There is no more data to return after this single string, so return pdFALSE. */
+  return pdFALSE;
 }
 
 /*-----------------------------------------------------------*/
