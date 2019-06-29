@@ -54,11 +54,11 @@ module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h26r0_weight1, .paramF
 #define STREAM_CLI_CASE      1
 #define STREAM_PORT_CASE     2
 #define STREAM_BUFFER_CASE   3
-#define STREAM_VERBOSE_CASE  4
+#define STREAM_CLI_VERBOSE_CASE  4
 #define SAMPLE_CLI_CASE      6
 #define SAMPLE_PORT_CASE     7
 #define SAMPLE_BUFFER_CASE   8
-#define SAMPLE_VERBOSE_CASE  9
+#define SAMPLE_CLI_VERBOSE_CASE  9
 #define IDLE_CASE            0
 //#define LoadcellTask
 
@@ -124,7 +124,7 @@ const CLI_Command_Definition_t sampleCommandDefinition =
 const CLI_Command_Definition_t streamCommandDefinition =
 {
   ( const int8_t * ) "stream", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) stream:\r\n Stream from ch (1 or 2) to the CLI with period (ms) and total time (ms). \r\n\r\n",
+  ( const int8_t * ) "(H26R0) stream:\r\n Stream from ch (1 or 2) to the CLI, buffer or port with period (ms) and total time (ms). \r\n\r\n",
   streamCommand, /* The function to run. */
   -1 /* Multiparameters are expected. */
 };
@@ -133,7 +133,7 @@ const CLI_Command_Definition_t streamCommandDefinition =
 const CLI_Command_Definition_t stopCommandDefinition =
 {
   ( const int8_t * ) "stop", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) stop:\r\n Stop the HX711\r\n\r\n",
+  ( const int8_t * ) "(H26R0) stop:\r\n Stop streaming and put HX711 into sleep mode\r\n\r\n",
   stopCommand, /* The function to run. */
   0 /* No parameters are expected. */
 };
@@ -403,13 +403,10 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 {
 	float Raw_Msg=0.0f;
   int8_t *pcOutputString;
-	//uint8_t stream_mode;
   static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %.2f\r\n";
 	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%.2f\r\n";
-  //static const int8_t *pcOutMaxRange = ( int8_t * ) "MAX\r\n";
-	//static const int8_t *pcOutTimeout = ( int8_t * ) "TIMEOUT\r\n";
   char *strUnit;
-  //specify the unit
+  /* specify the unit */
 	switch (unit)
 	{
 		case Gram: 
@@ -427,7 +424,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
   /* Get CLI output buffer */
   pcOutputString = FreeRTOS_CLIGetOutputBuffer();
 
-	if (mode != STREAM_VERBOSE_CASE && mode != STREAM_PORT_CASE)
+	if (mode != STREAM_CLI_VERBOSE_CASE && mode != STREAM_PORT_CASE)
 	{
 		strUnit = malloc(6*sizeof(char));
 		memset(strUnit, 0, (6*sizeof(char)));
@@ -453,51 +450,6 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		}
 	}
 
-	// If the value is out of range
-  /*if (Raw_Msg >= full_scale)
-  {
-    switch(mode)
-    {
-      case REQ_SAMPLE_CLI:
-      case REQ_STREAM_PORT_CLI:
-        mode = REQ_OUT_RANGE_CLI;
-        break;
-			case REQ_STREAM_MEMORY:
-				break;
-      case REQ_SAMPLE_ARR:
-      case REQ_STREAM_PORT_ARR:
-        mode = REQ_OUT_RANGE_ARR;
-        break;
-      default:        
-        break;
-    }
-  }*/
-
-	// If measurement timeout occured 
-/*	if (tofState == REQ_TIMEOUT)
-	{
-    switch(request)
-    {
-      case REQ_SAMPLE_CLI:
-      case REQ_STREAM_PORT_CLI:
-        request = REQ_TIMEOUT_CLI;
-        break;
-			case REQ_SAMPLE_VERBOSE_CLI:
-			case REQ_STREAM_VERBOSE_PORT_CLI:
-				request = REQ_TIMEOUT_VERBOSE_CLI;
-				break;
-			case REQ_STREAM_MEMORY:
-				request = REQ_TIMEOUT_MEMORY;
-				break;
-      case REQ_SAMPLE_ARR:
-      case REQ_STREAM_PORT_ARR:
-        request = REQ_TIMEOUT_ARR;
-        break;
-      default:        
-        break;
-    }				
-	}*/
-	
 	// Send the value to appropriate outlet
   switch(mode)
   {
@@ -508,8 +460,8 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 			CheckForEnterKey();
       break;
 
-    case SAMPLE_VERBOSE_CASE:
-    case STREAM_VERBOSE_CASE:
+    case SAMPLE_CLI_VERBOSE_CASE:
+    case STREAM_CLI_VERBOSE_CASE:
       sprintf( ( char * ) pcOutputString, ( char * ) pcWeightVerboseMsg, Raw_Msg);
       writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
 			CheckForEnterKey();
@@ -532,43 +484,9 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
       memset(Buffer, 0, sizeof(float));
       memcpy(Buffer, &Raw_Msg, sizeof(float));
       break;
-		/*
-    case REQ_OUT_RANGE_CLI:
-      strcpy( ( char * ) pcOutputString, ( char * ) pcOutMaxRange);
-      writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
-			CheckForEnterKey();
-      break;
-		
-    case REQ_OUT_RANGE_ARR:
-      SendMessageFromPort(global_port, myID, global_module, CODE_H08R6_MAX_RANGE, 0);
-      break;
-
-    case REQ_TIMEOUT_CLI:
-      strcpy( ( char * ) pcOutputString, ( char * ) pcOutTimeout);
-      writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
-			CheckForEnterKey();
-      break;
-
-    case REQ_TIMEOUT_VERBOSE_CLI:
-      sprintf( ( char * ) pcOutputString, ( char * ) pcDistanceVerboseMsg, 0);
-      writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
-			CheckForEnterKey();
-      break;
-		
-		case REQ_TIMEOUT_MEMORY:
-      memset(buffer, 0, sizeof(float));
-      break;
-
-    case REQ_TIMEOUT_ARR:
-      SendMessageFromPort(global_port, myID, global_module, CODE_H08R6_TIMEOUT, 0);
-      break;
-		
-    default:
-      break;
-  */
 	}
 	
-	if (mode != STREAM_VERBOSE_CASE && mode != STREAM_PORT_CASE){
+	if (mode != STREAM_CLI_VERBOSE_CASE && mode != STREAM_PORT_CASE){
 		free(strUnit);
 	}
 	return (H26R0_OK);
@@ -587,7 +505,7 @@ static void CheckForEnterKey(void)
   if ('\r' == pcOutputString[0])
   {
     startMeasurementRanging = STOP_MEASUREMENT_RANGING;
-		mode = IDLE_CASE;		     // Stop the streaming task
+		mode = IDLE_CASE;		                // Stop the streaming task
 	  xTimerStop( xTimer, 0 );            // Stop the timeout timer
   }
 }
@@ -611,7 +529,7 @@ void LoadcellTask(void * argument)
 				while(HAL_GetTick()-t0<(global_period-1)) {taskYIELD();}
 				break;
 				
-			case STREAM_VERBOSE_CASE:
+			case STREAM_CLI_VERBOSE_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
 				SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
@@ -651,7 +569,7 @@ static void HandleTimeout(TimerHandle_t xTimer)
   tid = ( uint32_t ) pvTimerGetTimerID( xTimer );
   if (TIMERID_TIMEOUT_MEASUREMENT == tid)
   {
-		mode = IDLE_CASE;		// Stop the streaming task
+		mode = IDLE_CASE;		                                    // Stop the streaming task
 		startMeasurementRanging = STOP_MEASUREMENT_RANGING;     // stop streaming
   }
 }
@@ -687,7 +605,6 @@ void SetHX711Gain(uint8_t ch)
 	switch(ch)
 	{
 		case(1): pulses=25;	gain=128; break;  //Chanel A, Gain factor 128
-		//case(64): pulses=26; 	break;  //Chanel A, Gain factor 64
 		case(2): pulses=27; gain=32;	break;  //Chanel B, Gain factor 32
 		default: pulses=25;
 	}
@@ -894,7 +811,7 @@ int StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_VERBOSE_CASE;
+	mode=STREAM_CLI_VERBOSE_CASE;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -1051,6 +968,20 @@ int ZeroCal(uint8_t Ch)
 
 /* --- HX711 Power Down
 */
+int Stop(void)
+{
+	mode=IDLE_CASE;
+  PowerDown();
+	xTimerStop( xTimer, 0 );
+	weight1_buffer=0;
+	weight2_buffer=0;
+  return H26R0_OK;	
+}
+
+/*-----------------------------------------------------------*/
+
+/* --- HX711 Power Down
+*/
 int PowerDown(void)
 {
 	//make PD_SCK pin high
@@ -1167,7 +1098,6 @@ static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 		if (result != H26R0_OK || channel != 1 || channel != 2 )
 		strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageError);
 		
-	//strcpy( ( char * ) pcWriteBuffer, ( char * ) "Weight: \r\n" );
   /* clean terminal output */
   memset((char *) pcWriteBuffer, 0, configCOMMAND_INT_MAX_OUTPUT_SIZE);
 
@@ -1252,7 +1182,6 @@ static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 	/* streaming data to internal buffer (module parameter) */
 	if (NULL != pcParameterString4 && !strncmp((const char *)pcParameterString4, "buffer", 6)) 
 	{
-		//buffer = atoi( (char *)pcParameterString3);
 		strcpy(( char * ) pcWriteBuffer, ( char * ) pcMessageBuffer);
 		if (channel==1){
 		StreamKGramToBuffer(channel, &weight1_buffer, period, timeout);
@@ -1317,12 +1246,7 @@ static portBASE_TYPE streamCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 
 static portBASE_TYPE stopCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString )
 {
-	mode=IDLE_CASE;
-  PowerDown();
-	xTimerStop( xTimer, 0 );
-	weight1_buffer=0;
-	weight2_buffer=0;
-  return H26R0_OK;	
+ Stop();
 }
 
 /*-----------------------------------------------------------*/

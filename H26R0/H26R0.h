@@ -90,6 +90,7 @@
 #define PD_SCK               GPIO_PIN_9
 #define TIMERID_TIMEOUT_MEASUREMENT   0xFF
 
+
 /* H26R0_Status Type Definition */  
 typedef enum 
 {
@@ -159,6 +160,7 @@ int StreamOunceToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Tim
 int StreamPoundToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
 float Average(uint8_t ch, uint8_t samples);
 int ZeroCal(uint8_t Ch);
+int Stop(void);
 int PowerDown(void);
 int PowerOn(void);
 

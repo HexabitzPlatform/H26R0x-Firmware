@@ -88,32 +88,10 @@ int main(void)
 /* UserTask function */
 void UserTask(void * argument)
 {
-	SetHX711Rate(10);
-	Calibration(3000,2,0.0094);
-	ZeroCal(1);
 
-	/*messageParams[0]=1;
-	messageParams[1]=0;
-	messageParams[2]=0;
-	messageParams[3]=0;
-	messageParams[4]=200;
-	messageParams[5]=0;
-	messageParams[6]=0;
-	messageParams[7]=0x03;
-	messageParams[8]=0xE8;
-	messageParams[9]=3;
-	messageParams[10]=1;
-
-	SendMessageToModule(1, CODE_H26R0_STREAM_PORT_OUNCE, 11);*/
   /* Infinite loop */
   for(;;)
   {
-		messageParams[0]=1;
-		SendMessageToModule(2, CODE_H26R0_SAMPLE_GRAM, 1);
-		Delay_ms(100);
-		weight= *(float *)ReadRemoteParam(2, "weight1", &format1, 1000);
-		//weight=SampleKGram(1);
-		Delay_ms(1000);
 		
 		
 	}
