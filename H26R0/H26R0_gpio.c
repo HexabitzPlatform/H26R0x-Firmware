@@ -70,4 +70,20 @@ void IND_LED_Init(void)
 	HAL_GPIO_Init(_IND_LED_PORT, &GPIO_InitStruct);
 }
 
+//-- Configure indicator LED
+void HX711_GPIO_Init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+	
+	GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_9;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	
+	GPIO_InitStruct.Pin = GPIO_PIN_10;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);	
+}
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

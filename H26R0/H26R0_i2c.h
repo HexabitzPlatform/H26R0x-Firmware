@@ -1,7 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : main.c
-  * Description        : Main program body
+  * File Name          : H08R6_i2c.h
+  * Description        : This file contains all the functions prototypes for
+  *                      the i2c
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -30,75 +31,32 @@
   *
   ******************************************************************************
   */
-	
+
 /*
 		MODIFIED by Hexabitz for BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
     All rights reserved
 */
 
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __i2c_H
+#define __i2c_H
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
-#include "BOS.h"
+#include "stm32f0xx_hal.h"
+
+extern I2C_HandleTypeDef hi2c1;
 
 
-/* Private variables ---------------------------------------------------------*/
-float weight=0.0;
-varFormat_t format1;
+extern void MX_I2C_Init(void);
+extern void MX_I2C1_Init(void);
 
-/* Private function prototypes -----------------------------------------------*/
-
-
-/* Main functions ------------------------------------------------------------*/
-
-int main(void)
-{
-
-
-  /* MCU Configuration----------------------------------------------------------*/
-
-  /* Reset all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* Initialize all user peripherals */
-
-	/* Initialize BitzOS */
-	BOS_Init();
-
-  /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
-
-  /* Start scheduler */
-  osKernelStart();
-  
-  /* We should never get here as control is now taken by the scheduler */
-
-
-  /* Infinite loop */
-  while (1)
-  {
-
-  }
-
+#ifdef __cplusplus
 }
-
-/*-----------------------------------------------------------*/
-
-/* UserTask function */
-void UserTask(void * argument)
-{
-
-  /* Infinite loop */
-  for(;;)
-  {
-		
-		
-	}
-
-}
+#endif
+#endif /*__i2c_H */
 
 
-/*-----------------------------------------------------------*/
-
-/************************ (C) COPYRIGHT HEXABITZ *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

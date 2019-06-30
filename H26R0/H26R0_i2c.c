@@ -1,7 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : main.c
-  * Description        : Main program body
+  * File Name          : H08R6_i2c.c
+  * Description        : This file provides code for the configuration
+  *                      of the I2C instances.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -30,9 +31,9 @@
   *
   ******************************************************************************
   */
-	
+
 /*
-		MODIFIED by Hexabitz for BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
+    MODIFIED by Hexabitz for BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
     All rights reserved
 */
 
@@ -40,65 +41,54 @@
 #include "BOS.h"
 
 
-/* Private variables ---------------------------------------------------------*/
-float weight=0.0;
-varFormat_t format1;
+I2C_HandleTypeDef hi2c1;
 
-/* Private function prototypes -----------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+/* Configure I2C                                                             */
+/*----------------------------------------------------------------------------*/
 
+/** I2C Configuration
+*/
+void MX_I2C_Init(void)
+{
+  /* GPIO Ports Clock Enable */
+  __GPIOC_CLK_ENABLE();
+  __GPIOA_CLK_ENABLE();
+  __GPIOD_CLK_ENABLE();
+  __GPIOB_CLK_ENABLE();
+  __GPIOF_CLK_ENABLE();   // for HSE and Boot0
 
-/* Main functions ------------------------------------------------------------*/
+  MX_I2C1_Init();
+}
 
-int main(void)
+//-- Configure indicator LED
+void MX_I2C1_Init(void)
 {
 
+  hi2c1.Instance = I2C1;
+  /* hi2c2.Init.Timing = 0x2010091A; */ /* fast mode: 400 KHz */
+  hi2c1.Init.Timing = 0x20303E5D; /* Standard mode: 100 KHz */
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  HAL_I2C_Init(&hi2c1);
 
-  /* MCU Configuration----------------------------------------------------------*/
+    /**Configure Analogue filter
+    */
+  HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE);
 
-  /* Reset all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* Initialize all user peripherals */
-
-	/* Initialize BitzOS */
-	BOS_Init();
-
-  /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
-
-  /* Start scheduler */
-  osKernelStart();
-  
-  /* We should never get here as control is now taken by the scheduler */
-
-
-  /* Infinite loop */
-  while (1)
-  {
-
-  }
-
+    /**Configure Digital filter
+    */
+  HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0);
 }
 
 /*-----------------------------------------------------------*/
 
-/* UserTask function */
-void UserTask(void * argument)
-{
-
-  /* Infinite loop */
-  for(;;)
-  {
-		
-		
-	}
-
-}
 
 
-/*-----------------------------------------------------------*/
 
-/************************ (C) COPYRIGHT HEXABITZ *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -78,14 +78,25 @@
 #define	USART6_RX_PORT	GPIOA
 #define	USART6_AF				GPIO_AF5_USART6
 
+#define STOP_MEASUREMENT_RANGING      0
+#define START_MEASUREMENT_RANGING     1
+
+/* Module_Status Type Definition */
+#define NUM_MODULE_PARAMS		2
+
 /* Module-specific Definitions */
+#define RATE_pin             GPIO_PIN_6
+#define DOUT                 GPIO_PIN_10
+#define PD_SCK               GPIO_PIN_9
+#define TIMERID_TIMEOUT_MEASUREMENT   0xFF
 
 
-/* H01R0_Status Type Definition */  
+/* H26R0_Status Type Definition */  
 typedef enum 
 {
   H26R0_OK = 0,
 	H26R0_ERR_UnknownMessage = 1,
+	H26R0_ERR_WrongParams,
 	H26R0_ERROR = 255
 } Module_Status;
 
@@ -116,21 +127,47 @@ extern void MX_USART6_UART_Init(void);
    ----------------------------------------------------------------------- 
 */
 
-
+#define CODE_H26R0_SET_RATE               2600
+#define CODE_H26R0_STREAM_PORT_GRAM       2601
+#define CODE_H26R0_STREAM_PORT_KGRAM      2602
+#define CODE_H26R0_STREAM_PORT_OUNCE      2603
+#define CODE_H26R0_STREAM_PORT_POUND      2604
+#define CODE_H26R0_STOP                   2605
+#define CODE_H26R0_SAMPLE_GRAM            2606
+#define CODE_H26R0_SAMPLE_KGRAM           2607
+#define CODE_H26R0_SAMPLE_OUNCE           2608
+#define CODE_H26R0_SAMPLE_POUND           2609
+ 
 
 	
 /* -----------------------------------------------------------------------
 	|																APIs	 																 	|
    ----------------------------------------------------------------------- 
 */
-
-
+void SetHX711Rate(uint8_t Data_Rate);
+float Calibration(uint16_t Full_Scale, float Cell_Output, float Cell_Drift);
+float SampleGram(uint8_t ch);
+float SampleKGram(uint8_t ch);
+float SampleOunce(uint8_t ch);
+float SamplePound(uint8_t ch);
+int StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+int StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+int StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+int StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
+int StreamGramToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+int StreamKGramToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+int StreamOunceToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+int StreamPoundToBuffer(uint8_t Ch, float *buffer, uint32_t Period, uint32_t Timeout);
+float Average(uint8_t ch, uint8_t samples);
+int ZeroCal(uint8_t Ch);
+int Stop(void);
+int PowerDown(void);
+int PowerOn(void);
 
 /* -----------------------------------------------------------------------
 	|															Commands																 	|
    ----------------------------------------------------------------------- 
 */
-
 
 
 

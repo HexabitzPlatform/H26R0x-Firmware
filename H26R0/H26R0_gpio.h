@@ -50,7 +50,7 @@
 
 extern void MX_GPIO_Init(void);
 extern void IND_LED_Init(void);
-
+extern void HX711_GPIO_Init(void);
 
 #ifdef __cplusplus
 }
