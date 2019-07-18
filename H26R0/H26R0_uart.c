@@ -83,7 +83,7 @@ void MX_USART2_UART_Init(void)
   huart2.Init.OneBitSampling = UART_ONEBIT_SAMPLING_DISABLED;
   huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	HAL_UART_Init(&huart2);
-	#if _P1pol_reversed
+	#if _P2pol_reversed
 		huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_SWAP_INIT;
 		huart2.AdvancedInit.Swap = UART_ADVFEATURE_SWAP_ENABLE;
 	  HAL_UART_Init(&huart2);
@@ -106,7 +106,7 @@ void MX_USART3_UART_Init(void)
   huart3.Init.OneBitSampling = UART_ONEBIT_SAMPLING_DISABLED;
   huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	HAL_UART_Init(&huart3);
-	#if _P3pol_reversed
+	#if _P4pol_reversed
 		huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_SWAP_INIT;
 		huart3.AdvancedInit.Swap = UART_ADVFEATURE_SWAP_ENABLE;
 	  HAL_UART_Init(&huart3);
@@ -129,7 +129,7 @@ void MX_USART4_UART_Init(void)
   huart4.Init.OneBitSampling = UART_ONEBIT_SAMPLING_DISABLED;
   huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	HAL_UART_Init(&huart4);
-	#if _P6pol_reversed	
+	#if _P1pol_reversed	
 		huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_SWAP_INIT;
 		huart4.AdvancedInit.Swap = UART_ADVFEATURE_SWAP_ENABLE;
 	  HAL_UART_Init(&huart4);
@@ -175,7 +175,7 @@ void MX_USART6_UART_Init(void)
   huart6.Init.OneBitSampling = UART_ONEBIT_SAMPLING_DISABLED;
   huart6.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	HAL_UART_Init(&huart6);
-	#if _P2pol_reversed
+	#if _P3pol_reversed
 		huart6.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_SWAP_INIT;
 		huart6.AdvancedInit.Swap = UART_ADVFEATURE_SWAP_ENABLE;
 	  HAL_UART_Init(&huart6);
