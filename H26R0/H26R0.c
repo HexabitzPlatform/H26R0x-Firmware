@@ -210,7 +210,6 @@ void Module_Init(void)
 	MX_USART4_UART_Init();
   MX_USART5_UART_Init();
   MX_USART6_UART_Init();
-	MX_GPIO_Init();
 	
 	/* HX711 */
   // GPIO init
@@ -475,7 +474,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 			else{
 					messageParams[0]=Port;
 					memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
-					SendMessageToModule(Module, CODE_port_forward, sizeof(float)+1);
+					SendMessageToModule(Module, CODE_PORT_FORWARD, sizeof(float)+1);
 			}
       break;
 		

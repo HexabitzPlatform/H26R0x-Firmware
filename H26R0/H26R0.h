@@ -121,24 +121,6 @@ extern void MX_USART5_UART_Init(void);
 extern void MX_USART6_UART_Init(void);
 
 
-
-/* -----------------------------------------------------------------------
-	|														Message Codes	 														 	|
-   ----------------------------------------------------------------------- 
-*/
-
-#define CODE_H26R0_SET_RATE               2600
-#define CODE_H26R0_STREAM_PORT_GRAM       2601
-#define CODE_H26R0_STREAM_PORT_KGRAM      2602
-#define CODE_H26R0_STREAM_PORT_OUNCE      2603
-#define CODE_H26R0_STREAM_PORT_POUND      2604
-#define CODE_H26R0_STOP                   2605
-#define CODE_H26R0_SAMPLE_GRAM            2606
-#define CODE_H26R0_SAMPLE_KGRAM           2607
-#define CODE_H26R0_SAMPLE_OUNCE           2608
-#define CODE_H26R0_SAMPLE_POUND           2609
- 
-
 	
 /* -----------------------------------------------------------------------
 	|																APIs	 																 	|
