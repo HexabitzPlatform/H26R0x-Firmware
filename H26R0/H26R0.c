@@ -1373,7 +1373,7 @@ static portBASE_TYPE calibrationCommand( int8_t *pcWriteBuffer, size_t xWriteBuf
 	/* 2nd parameter for the output of the load cell */
   pcParameterString2 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 2, &xParameterStringLength2);
 	/* 3rd parameter for the drift of the load cell */
-  pcParameterString2 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 3, &xParameterStringLength3);
+  pcParameterString3 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 3, &xParameterStringLength3);
 	
   if (NULL != pcParameterString1)
   {
