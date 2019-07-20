@@ -73,13 +73,17 @@ float calibration_factor=0.0f, Zero_Drift=0.0f;
 static float cell_output=0.0;
 static float cell_drift=0.00002;
 static float weight=0.0f;
-float DATA_To_SEND=0.0f;
+float DATA_To_SEND=0.0f;     //float
 bool Current_pin_state=0;
 float weightGram=0.0f, weightKGram=0.0f, weightOunce=0.0f, weightPound=0.0f;
 float Sample[256]={0.0};
 TaskHandle_t LoadcellHandle = NULL;
 TimerHandle_t xTimer = NULL;
 uint8_t startMeasurementRanging = STOP_MEASUREMENT_RANGING;
+uint16_t EE_full_scale=0;
+uint16_t word_LSB=0, word_MSB=0;
+uint32_t temp32=0;
+
 
 /* Private function prototypes -----------------------------------------------*/	
 float readHX711(void);
@@ -212,12 +216,26 @@ void Module_Init(void)
   MX_USART6_UART_Init();
 	
 	/* HX711 */
-  // GPIO init
-	HX711_GPIO_Init();
+	HX711_GPIO_Init();     // GPIO init
 	
 	/* Creat load cell task */
 	xTaskCreate(LoadcellTask, (const char*) "LoadcellTask", (2*configMINIMAL_STACK_SIZE), NULL, osPriorityNormal, &LoadcellHandle);	
 	
+	/* load saved var*/
+	EE_ReadVariable(VirtAddVarTab[_EE_cell_full_scale], &full_scale);
+	EE_ReadVariable(VirtAddVarTab[_EE_cell_drift_LSB], &word_LSB);
+	EE_ReadVariable(VirtAddVarTab[_EE_cell_drift_MSB], &word_MSB);
+	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
+	cell_drift=*(float*)&temp32;
+	EE_ReadVariable(VirtAddVarTab[_EE_cell_output_LSB], &word_LSB);
+	EE_ReadVariable(VirtAddVarTab[_EE_cell_output_MSB], &word_MSB);
+	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
+	cell_output=*(float*)&temp32;
+	EE_ReadVariable(VirtAddVarTab[_EE_zero_drift_LSB], &word_LSB);
+	EE_ReadVariable(VirtAddVarTab[_EE_zero_drift_MSB], &word_MSB);
+	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
+	Zero_Drift=*(float*)&temp32;
+
 	
 }
 /*-----------------------------------------------------------*/
@@ -622,7 +640,16 @@ float Calibration(uint16_t Full_Scale,float Cell_Output,float Cell_Drift)
 	cell_output=Cell_Output;
 	full_scale=Full_Scale;
 	cell_drift=Cell_Drift/1000.0f;
-	calibration_factor=cell_output*AVDD/1000.0f;		// mV	
+	calibration_factor=cell_output*AVDD/1000.0f;		// mV
+	EE_WriteVariable(VirtAddVarTab[_EE_cell_full_scale], full_scale);
+	word_LSB=*(uint16_t*)&cell_drift;
+	word_MSB=*(((uint16_t*)&cell_drift)+1);
+	EE_WriteVariable(VirtAddVarTab[_EE_cell_drift_LSB], word_LSB);
+	EE_WriteVariable(VirtAddVarTab[_EE_cell_drift_MSB], word_MSB);
+	word_LSB=*(uint16_t*)&cell_output;
+	word_MSB=*(((uint16_t*)&cell_output)+1);
+	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_LSB], word_LSB);
+	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_MSB], word_MSB);
 	return H26R0_OK;
 }
 
@@ -963,6 +990,11 @@ int ZeroCal(uint8_t Ch)
 	uint8_t ch;
 	ch=Ch;
 	Zero_Drift=(Average(ch,10)*0.5*AVDD)/(ADC_full_range*gain);
+	temp32=*(uint32_t*)&Zero_Drift;
+	word_LSB=0x0000FFFF & temp32;
+	word_MSB=0xFFFF0000 & temp32;
+	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_MSB], word_LSB);
+	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_MSB], word_MSB);
 	
 	return (H26R0_OK);
 }
