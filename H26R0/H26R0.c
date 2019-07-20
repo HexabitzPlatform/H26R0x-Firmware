@@ -32,36 +32,36 @@ UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart6;
 
 /* Module exported parameters ------------------------------------------------*/
-float h26r0_weight1 = 123.4f;
+float h26r0_weight1 = 0.0f;
 float h26r0_weight2 = 0.0f;
 module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h26r0_weight1, .paramFormat=FMT_FLOAT, .paramName="weight1"} ,
 {.paramPtr=&h26r0_weight2, .paramFormat=FMT_FLOAT, .paramName="weight2"}};
 
 /* Private variables ---------------------------------------------------------*/
 /* Define HX711 pins */
-#define AVDD                 3 //2.44
+#define AVDD                     3 //2.44
 
 /* Define preprocessor variables */
-#define ADC_full_range       0x7FFFFF
-#define Kg2Gram_ratio        1000
-#define Kg2Pound_ratio       2.20462262 
-#define Kg2Ounce_ratio       35.274
-#define Gram                 1
-#define KGram                2
-#define Ounce                3
-#define Pound                4
-#define IC_drift             0.00000938         
-#define STREAM_CLI_CASE      1
-#define STREAM_PORT_CASE     2
-#define STREAM_BUFFER_CASE   3
+#define ADC_full_range           0x7FFFFF
+#define Kg2Gram_ratio            1000
+#define Kg2Pound_ratio           2.20462262 
+#define Kg2Ounce_ratio           35.274
+#define Gram                     1
+#define KGram                    2
+#define Ounce                    3
+#define Pound                    4
+#define IC_drift                 0.00000938         
+#define STREAM_CLI_CASE          1
+#define STREAM_PORT_CASE         2
+#define STREAM_BUFFER_CASE       3
 #define STREAM_CLI_VERBOSE_CASE  4
-#define SAMPLE_CLI_CASE      6
-#define SAMPLE_PORT_CASE     7
-#define SAMPLE_BUFFER_CASE   8
+#define SAMPLE_CLI_CASE          6
+#define SAMPLE_PORT_CASE         7
+#define SAMPLE_BUFFER_CASE       8
 #define SAMPLE_CLI_VERBOSE_CASE  9
-#define IDLE_CASE            0
-//#define LoadcellTask
+#define IDLE_CASE                0
 
+/*Define private variables*/
 uint8_t pulses=0, rate=0, gain=128;
 uint16_t full_scale=0;
 uint32_t Data=0, value=0;
@@ -292,6 +292,10 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 				h26r0_weight1=SampleGram(cMessage[port-1][4]);
 			else
 				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+			break;
+			
+			case (CODE_H26R0_ZEROCAL):
+				ZeroCal(cMessage[port-1][4]);
 			break;
 			
 		default:
@@ -1432,18 +1436,20 @@ static portBASE_TYPE zerocalCommand( int8_t *pcWriteBuffer, size_t xWriteBufferL
   if (!strncmp((const char *)pcParameterString1, "1", 1))
   {
     channel=1;
+		ZeroCal(channel);
     strcpy( ( char * ) pcWriteBuffer, ( char * ) "Zero calibration for channel 1\r\n" );
   }
   else if (!strncmp((const char *)pcParameterString1, "2", 1))
   {
     channel=2;
+		ZeroCal(channel);
     strcpy( ( char * ) pcWriteBuffer, ( char * ) "Zero calibration for channel 2\r\n" );
   }
 	else
 	{
 		strcpy( ( char * ) pcWriteBuffer, ( char * ) pcMessageWrongParam );
 	}
-	ZeroCal(channel);
+	
 	return 0;	
 }
 
