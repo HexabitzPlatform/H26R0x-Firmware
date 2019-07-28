@@ -91,6 +91,15 @@
 #define PD_SCK               GPIO_PIN_9
 #define TIMERID_TIMEOUT_MEASUREMENT   0xFF
 
+// Module EEPROM variables addresses - Module Addressing Space 500 - 599
+#define _EE_cell_full_scale		500
+#define _EE_cell_drift_LSB		501
+#define _EE_cell_drift_MSB		502
+#define _EE_cell_output_LSB		503
+#define _EE_cell_output_MSB		504
+#define _EE_zero_drift_LSB		505
+#define _EE_zero_drift_MSB		506
+
 
 /* H26R0_Status Type Definition */  
 typedef enum 

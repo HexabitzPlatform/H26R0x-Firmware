@@ -222,17 +222,17 @@ void Module_Init(void)
 	xTaskCreate(LoadcellTask, (const char*) "LoadcellTask", (2*configMINIMAL_STACK_SIZE), NULL, osPriorityNormal, &LoadcellHandle);	
 	
 	/* load saved var*/
-	EE_ReadVariable(VirtAddVarTab[_EE_cell_full_scale], &full_scale);
-	EE_ReadVariable(VirtAddVarTab[_EE_cell_drift_LSB], &word_LSB);
-	EE_ReadVariable(VirtAddVarTab[_EE_cell_drift_MSB], &word_MSB);
+	EE_ReadVariable(_EE_cell_full_scale, &full_scale);
+	EE_ReadVariable(_EE_cell_drift_LSB, &word_LSB);
+	EE_ReadVariable(_EE_cell_drift_MSB, &word_MSB);
 	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
 	cell_drift=*(float*)&temp32;
-	EE_ReadVariable(VirtAddVarTab[_EE_cell_output_LSB], &word_LSB);
-	EE_ReadVariable(VirtAddVarTab[_EE_cell_output_MSB], &word_MSB);
+	EE_ReadVariable(_EE_cell_output_LSB, &word_LSB);
+	EE_ReadVariable(_EE_cell_output_MSB, &word_MSB);
 	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
 	cell_output=*(float*)&temp32;
-	EE_ReadVariable(VirtAddVarTab[_EE_zero_drift_LSB], &word_LSB);
-	EE_ReadVariable(VirtAddVarTab[_EE_zero_drift_MSB], &word_MSB);
+	EE_ReadVariable(_EE_zero_drift_LSB, &word_LSB);
+	EE_ReadVariable(_EE_zero_drift_MSB, &word_MSB);
 	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
 	Zero_Drift=*(float*)&temp32;
 
@@ -641,15 +641,15 @@ float Calibration(uint16_t Full_Scale,float Cell_Output,float Cell_Drift)
 	full_scale=Full_Scale;
 	cell_drift=Cell_Drift/1000.0f;
 	calibration_factor=cell_output*AVDD/1000.0f;		// mV
-	EE_WriteVariable(VirtAddVarTab[_EE_cell_full_scale], full_scale);
+	EE_WriteVariable(_EE_cell_full_scale, full_scale);
 	word_LSB=*(uint16_t*)&cell_drift;
 	word_MSB=*(((uint16_t*)&cell_drift)+1);
-	EE_WriteVariable(VirtAddVarTab[_EE_cell_drift_LSB], word_LSB);
-	EE_WriteVariable(VirtAddVarTab[_EE_cell_drift_MSB], word_MSB);
+	EE_WriteVariable(_EE_cell_drift_LSB, word_LSB);
+	EE_WriteVariable(_EE_cell_drift_MSB, word_MSB);
 	word_LSB=*(uint16_t*)&cell_output;
 	word_MSB=*(((uint16_t*)&cell_output)+1);
-	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_LSB], word_LSB);
-	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_MSB], word_MSB);
+	EE_WriteVariable(_EE_cell_output_LSB, word_LSB);
+	EE_WriteVariable(_EE_cell_output_MSB, word_MSB);
 	return H26R0_OK;
 }
 
@@ -993,8 +993,8 @@ int ZeroCal(uint8_t Ch)
 	temp32=*(uint32_t*)&Zero_Drift;
 	word_LSB=0x0000FFFF & temp32;
 	word_MSB=0xFFFF0000 & temp32;
-	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_MSB], word_LSB);
-	EE_WriteVariable(VirtAddVarTab[_EE_cell_output_MSB], word_MSB);
+	EE_WriteVariable(_EE_cell_output_MSB, word_LSB);
+	EE_WriteVariable(_EE_cell_output_MSB, word_MSB);
 	
 	return (H26R0_OK);
 }
