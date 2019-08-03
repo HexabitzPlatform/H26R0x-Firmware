@@ -258,25 +258,25 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 		case (CODE_H26R0_STREAM_PORT_GRAM):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
-			StreamGramToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
+			StreamGramToPort(cMessage[port-1][4], cMessage[port-1][13], cMessage[port-1][14], period, timeout);
 			break;
 		
 		case (CODE_H26R0_STREAM_PORT_KGRAM):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
-			StreamKGramToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
+			StreamKGramToPort(cMessage[port-1][4], cMessage[port-1][13], cMessage[port-1][14], period, timeout);
 			break;
 		
     case (CODE_H26R0_STREAM_PORT_OUNCE):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
-			StreamOunceToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
+			StreamOunceToPort(cMessage[port-1][4], cMessage[port-1][13], cMessage[port-1][14], period, timeout);
 			break;
 		
 		case (CODE_H26R0_STREAM_PORT_POUND):
 			period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 			timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
-			StreamPoundToPort(cMessage[port-1][4], period, timeout, cMessage[port-1][13], cMessage[port-1][14]);
+			StreamPoundToPort(cMessage[port-1][4], cMessage[port-1][13], cMessage[port-1][14], period, timeout);
 			break;
 		
 		case (CODE_H26R0_STOP):
