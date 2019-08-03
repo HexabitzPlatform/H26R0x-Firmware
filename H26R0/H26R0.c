@@ -50,7 +50,7 @@ module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h26r0_weight1, .paramF
 #define KGram                    2
 #define Ounce                    3
 #define Pound                    4
-#define IC_drift                 0.00000938         
+#define IC_drift                 0.00000938     //00000938  the best value  
 #define STREAM_CLI_CASE          1
 #define STREAM_PORT_CASE         2
 #define STREAM_BUFFER_CASE       3
@@ -65,7 +65,7 @@ module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h26r0_weight1, .paramF
 uint8_t pulses=0, rate=0, gain=128;
 uint16_t full_scale=0;
 uint32_t Data=0, value=0;
-uint8_t global_ch, global_port, global_module, mode, unit;
+uint8_t global_ch, global_port, global_module, mode, unit=KGram;
 uint32_t global_period, global_timeout;
 float weight1_buffer, weight2_buffer; float *ptr_weight_buffer;
 float valuef = 0.0f, rawvalue=0.0f;
@@ -235,6 +235,7 @@ void Module_Init(void)
 	EE_ReadVariable(_EE_zero_drift_MSB, &word_MSB);
 	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
 	Zero_Drift=*(float*)&temp32;
+	calibration_factor=cell_output*AVDD/1000.0f;		// mV
 
 	
 }
@@ -989,12 +990,16 @@ int ZeroCal(uint8_t Ch)
 {
 	uint8_t ch;
 	ch=Ch;
-	Zero_Drift=(Average(ch,10)*0.5*AVDD)/(ADC_full_range*gain);
+	IND_ON();
+	SetHX711Rate(80);
+	Zero_Drift=(Average(ch,100)*0.5*AVDD)/(ADC_full_range*gain);
 	temp32=*(uint32_t*)&Zero_Drift;
+	SetHX711Rate(10);
 	word_LSB=0x0000FFFF & temp32;
 	word_MSB=0xFFFF0000 & temp32;
 	EE_WriteVariable(_EE_cell_output_MSB, word_LSB);
 	EE_WriteVariable(_EE_cell_output_MSB, word_MSB);
+	IND_OFF();
 	
 	return (H26R0_OK);
 }
