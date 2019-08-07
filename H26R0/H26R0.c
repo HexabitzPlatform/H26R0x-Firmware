@@ -219,7 +219,7 @@ void Module_Init(void)
 	HX711_GPIO_Init();     // GPIO init
 	
 	/* Creat load cell task */
-	xTaskCreate(LoadcellTask, (const char*) "LoadcellTask", (2*configMINIMAL_STACK_SIZE), NULL, osPriorityNormal, &LoadcellHandle);	
+	xTaskCreate(LoadcellTask, (const char*) "LoadcellTask", (2*configMINIMAL_STACK_SIZE), NULL, osPriorityNormal-osPriorityIdle, &LoadcellHandle);	
 	
 	/* load saved var*/
 	EE_ReadVariable(_EE_cell_full_scale, &full_scale);
