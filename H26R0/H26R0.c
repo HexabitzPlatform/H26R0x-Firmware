@@ -110,7 +110,7 @@ static portBASE_TYPE weight2ModParamCommand( int8_t *pcWriteBuffer, size_t xWrit
 const CLI_Command_Definition_t demoCommandDefinition =
 {
 	( const int8_t * ) "demo", /* The command string to type. */
-	( const int8_t * ) "(H26R0) demo:\r\n Run a demo program to test module functionality\r\n\r\n",
+	( const int8_t * ) "demo:\r\n Run a demo program to test module functionality\r\n\r\n",
 	demoCommand, /* The function to run. */
 	1 /* one parameter is expected. */
 };
@@ -119,7 +119,7 @@ const CLI_Command_Definition_t demoCommandDefinition =
 const CLI_Command_Definition_t sampleCommandDefinition =
 {
   ( const int8_t * ) "sample", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) sample:\r\n Take one sample from ch (1 or 2)\r\n\r\n",
+  ( const int8_t * ) "sample:\r\n Take one sample from ch (1 or 2)\r\n\r\n",
   sampleCommand, /* The function to run. */
   1 /* one parameter is expected. */
 };
@@ -128,7 +128,7 @@ const CLI_Command_Definition_t sampleCommandDefinition =
 const CLI_Command_Definition_t streamCommandDefinition =
 {
   ( const int8_t * ) "stream", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) stream:\r\n Stream from ch (1 or 2) to the CLI, buffer or port with period (ms) and total time (ms). \r\n\r\n",
+  ( const int8_t * ) "stream:\r\n Stream from ch (1 or 2) to the CLI, buffer or port with period (ms) and total time (ms). \r\n\r\n",
   streamCommand, /* The function to run. */
   -1 /* Multiparameters are expected. */
 };
@@ -137,7 +137,7 @@ const CLI_Command_Definition_t streamCommandDefinition =
 const CLI_Command_Definition_t stopCommandDefinition =
 {
   ( const int8_t * ) "stop", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) stop:\r\n Stop streaming and put HX711 into sleep mode\r\n\r\n",
+  ( const int8_t * ) "stop:\r\n Stop streaming and put HX711 into sleep mode\r\n\r\n",
   stopCommand, /* The function to run. */
   0 /* No parameters are expected. */
 };
@@ -146,7 +146,7 @@ const CLI_Command_Definition_t stopCommandDefinition =
 const CLI_Command_Definition_t unitCommandDefinition =
 {
   ( const int8_t * ) "unit", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) unit:\r\n Set the measurement unit (g, kg, ounce, lb)\r\n\r\n",
+  ( const int8_t * ) "unit:\r\n Set the measurement unit (g, kg, ounce, lb)\r\n\r\n",
   unitCommand, /* The function to run. */
   1 /* one parameter is expected. */
 };
@@ -155,7 +155,7 @@ const CLI_Command_Definition_t unitCommandDefinition =
 const CLI_Command_Definition_t rateCommandDefinition =
 {
   ( const int8_t * ) "rate", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) rate:\r\n Set HX711 measurement rate in sample per second (10, 80)\r\n\r\n",
+  ( const int8_t * ) "rate:\r\n Set HX711 measurement rate in sample per second (10, 80)\r\n\r\n",
   rateCommand, /* The function to run. */
   1 /* one parameter is expected. */
 };
@@ -165,7 +165,7 @@ const CLI_Command_Definition_t rateCommandDefinition =
 const CLI_Command_Definition_t calibrationCommandDefinition =
 {
   ( const int8_t * ) "calibration", /* The command string to type. */
-		( const int8_t * ) "(H26R0) calibration:\r\n Set load cell calibration values: (1st) full scale in Kg, (2nd) cell output in mV, (3rd) cell drift in mV\r\n\r\n",
+		( const int8_t * ) "calibration:\r\n Set load cell calibration values: (1st) full scale in Kg, (2nd) cell output in mV, (3rd) cell drift in mV\r\n\r\n",
   calibrationCommand, /* The function to run. */
   3 /* three parameters are expected. */
 };
@@ -174,7 +174,7 @@ const CLI_Command_Definition_t calibrationCommandDefinition =
 const CLI_Command_Definition_t zerocalCommandDefinition =
 {
   ( const int8_t * ) "zerocal", /* The command string to type. */
-  ( const int8_t * ) "(H26R0) zerocal:\r\n Choose the channel to make zero calibration for the load cell\r\n\r\n",
+  ( const int8_t * ) "zerocal:\r\n Choose the channel to make zero calibration for the load cell\r\n\r\n",
   zerocalCommand, /* The function to run. */
   1 /* one parameter is expected. */
 };
@@ -184,7 +184,7 @@ const CLI_Command_Definition_t zerocalCommandDefinition =
 const CLI_Command_Definition_t weight1CommandDefinition =
 {
   ( const int8_t * ) "weight1", /* The command string to type. */
-		( const int8_t * ) "(H26R0) weight1:\r\nDisplay the value of module parameter: channel_1's weight\r\n\r\n",
+		( const int8_t * ) "weight1:\r\nDisplay the value of module parameter: channel_1's weight\r\n\r\n",
   weight1ModParamCommand, /* The function to run. */
   0 /* No parameters are expected. */
 };
@@ -194,7 +194,7 @@ const CLI_Command_Definition_t weight1CommandDefinition =
 const CLI_Command_Definition_t weight2CommandDefinition =
 {
   ( const int8_t * ) "weight2", /* The command string to type. */
-		( const int8_t * ) "(H26R0) weight2:\r\nDisplay the value of module parameter: channel_2's weight\r\n\r\n",
+		( const int8_t * ) "weight2:\r\nDisplay the value of module parameter: channel_2's weight\r\n\r\n",
   weight2ModParamCommand, /* The function to run. */
   0 /* No parameters are expected. */
 };
