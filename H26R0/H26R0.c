@@ -325,7 +325,7 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			if (cMessage[port-1][4] == 1)
 				H26R0_Weight1=SamplePound(cMessage[port-1][4]);
 			else
-				H26R0_Weight2=SamplePound(cMessage[port-1][4]);	
+				H26R0_Weight2=SamplePound(cMessage[port-1][4]);
 			break;
 			
 		case (CODE_H26R0_ZEROCAL):
