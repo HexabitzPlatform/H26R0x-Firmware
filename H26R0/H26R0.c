@@ -333,20 +333,20 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			break;
 			
 		case (CODE_H26R0_STREAM_RAW):
-			if (cMessage[port-1][4] == 1)
-			{
 					period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
 					timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
 					StreamRawToPort(cMessage[port-1][4], cMessage[port-1][13], cMessage[port-1][14], period, timeout);
-			}else
 				H26R0_Weight2=Average(cMessage[port-1][4],1);	
 			break;
 			
 		case (CODE_H26R0_SAMPLE_RAW):
-			if (cMessage[port-1][4] == 1)
-				H26R0_Weight1=Average(cMessage[port-1][4],1);
-			else
 				H26R0_Weight2=Average(cMessage[port-1][4],1);	
+			break;
+		case (CODE_H26R0_STREAM_FORMAT):
+			if (cMessage[port-1][4] == 0)
+				H26R0_DATA_FORMAT = FMT_UINT32;
+			else
+				H26R0_DATA_FORMAT = FMT_FLOAT;
 			break;
 			
 		default:
@@ -458,11 +458,11 @@ float weightCalculation(void)
 int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t Module, float *Buffer)
 {
 	float Raw_Msg=0.0f;
+	uint32_t RawMsgInt=0;
   int8_t *pcOutputString;
   static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %d\r\n";
 	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%d\r\n";
   char *strUnit;
-	
   /* specify the unit */
 	switch (unit)
 	{
@@ -503,10 +503,32 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		{
 			sprintf( ( char * ) strUnit, "Pound");
 		}
+		else if (unit == RAW)
+		{
+			sprintf( ( char * ) strUnit, "Raw Data");
+			
+		}
 		else
 		{
 			sprintf( ( char * ) strUnit, "Kg");
 		}
+	}
+
+  /* specify the unit */
+	switch (unit)
+	{
+		case Gram: 
+			Raw_Msg=message*Kg2Gram_ratio; break;
+		case KGram:
+			Raw_Msg=message; break;
+		case Ounce:
+			Raw_Msg=message*Kg2Ounce_ratio; break;
+		case Pound:
+			Raw_Msg=message*Kg2Pound_ratio; break;
+		case RAW:
+			Raw_Msg=Average(global_ch, 1);
+		default:
+			Raw_Msg=message; break;
 	}
 
 	// Send the value to appropriate outlet
@@ -528,14 +550,33 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		
     case SAMPLE_PORT_CASE:
     case STREAM_PORT_CASE:
-			if (Module==myID){
-					writePxITMutex(Port, (char *)&Raw_Msg, sizeof(Raw_Msg), 10);
+			if (H26R0_DATA_FORMAT == FMT_UINT32)
+			{
+				RawMsgInt=Raw_Msg*10;
+				if (Module==myID){
+						writePxITMutex(Port, (char *)&RawMsgInt, sizeof(uint32_t), 10);
+				}
+				else{
+						messageParams[0]=Port;
+						memcpy(&messageParams[1], &RawMsgInt, sizeof(uint32_t));
+						SendMessageToModule(Module, CODE_port_forward, sizeof(uint32_t)+1);
+				}
+			
 			}
-			else{
-					messageParams[0]=Port;
-					memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
-					SendMessageToModule(Module, CODE_PORT_FORWARD, sizeof(float)+1);
+			else if (H26R0_DATA_FORMAT == FMT_FLOAT)
+			{
+				if (Module==myID){
+						writePxITMutex(Port, (char *)&Raw_Msg, sizeof(float), 10);
+				}
+				else{
+						messageParams[0]=Port;
+						memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
+						SendMessageToModule(Module, CODE_port_forward, sizeof(float)+1);
+				
 			}
+		}
+			else
+				
       break;
 		
     case SAMPLE_BUFFER_CASE:
@@ -543,8 +584,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
       memset(Buffer, 0, sizeof(float));
       memcpy(Buffer, &Raw_Msg, sizeof(float));
       break;
-	}
-	
+	}	
 	if (mode != STREAM_CLI_VERBOSE_CASE && mode != STREAM_PORT_CASE){
 		free(strUnit);
 	}
@@ -1611,7 +1651,7 @@ static portBASE_TYPE formatModParamCommand( int8_t *pcWriteBuffer, size_t xWrite
   pcParameterString1 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 1, &xParameterStringLength1);
   if (!strncmp((const char *)pcParameterString1, "0", 1))
   {
-    H26R0_DATA_FORMAT = FMT_UINT8;      
+    H26R0_DATA_FORMAT = FMT_UINT32;      
     strcpy( ( char * ) pcWriteBuffer, ( char * ) "Used data format: uint\r\n" );
   }
   else if (!strncmp((const char *)pcParameterString1, "1", 1))
