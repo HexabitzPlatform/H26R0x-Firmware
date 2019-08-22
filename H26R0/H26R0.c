@@ -559,7 +559,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 				else{
 						messageParams[0]=Port;
 						memcpy(&messageParams[1], &RawMsgInt, sizeof(uint32_t));
-						SendMessageToModule(Module, CODE_port_forward, sizeof(uint32_t)+1);
+						SendMessageToModule(Module, CODE_PORT_FORWARD, sizeof(uint32_t)+1);
 				}
 			
 			}
@@ -571,7 +571,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 				else{
 						messageParams[0]=Port;
 						memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
-						SendMessageToModule(Module, CODE_port_forward, sizeof(float)+1);
+						SendMessageToModule(Module, CODE_PORT_FORWARD, sizeof(float)+1);
 				
 			}
 		}
