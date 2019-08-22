@@ -32,10 +32,11 @@ UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart6;
 
 /* Module exported parameters ------------------------------------------------*/
-float h26r0_weight1 = 0.0f;
-float h26r0_weight2 = 0.0f;
-module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&h26r0_weight1, .paramFormat=FMT_FLOAT, .paramName="weight1"} ,
-{.paramPtr=&h26r0_weight2, .paramFormat=FMT_FLOAT, .paramName="weight2"}};
+float H26R0_Weight1 = 0.0f;
+float H26R0_Weight2 = 0.0f;
+uint8_t H26R0_DATA_FORMAT = 0;
+module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&H26R0_Weight1, .paramFormat=FMT_FLOAT, .paramName="weight1"} ,
+{.paramPtr=&H26R0_Weight2, .paramFormat=FMT_FLOAT, .paramName="weight2"}, {.paramPtr=&H26R0_DATA_FORMAT, .paramFormat=FMT_UINT8, .paramName="format"}};
 
 /* Private variables ---------------------------------------------------------*/
 /* Define HX711 pins */
@@ -287,34 +288,51 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 		
 		case (CODE_H26R0_SAMPLE_GRAM):
 			if (cMessage[port-1][4] == 1)
-				h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				H26R0_Weight1=SampleGram(cMessage[port-1][4]);
 			else
-				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+				H26R0_Weight2=SampleGram(cMessage[port-1][4]);
 			break;
 			
 		case (CODE_H26R0_SAMPLE_KGRAM):
 			if (cMessage[port-1][4] == 1)
-				h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				H26R0_Weight1=SampleKGram(cMessage[port-1][4]);
 			else
-				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+				H26R0_Weight2=SampleKGram(cMessage[port-1][4]);	
 			break;
 			
 		case (CODE_H26R0_SAMPLE_OUNCE):
 			if (cMessage[port-1][4] == 1)
-				h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				H26R0_Weight1=SampleOunce(cMessage[port-1][4]);
 			else
-				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+				H26R0_Weight2=SampleOunce(cMessage[port-1][4]);	
 			break;
 			
 		case (CODE_H26R0_SAMPLE_POUND):
 			if (cMessage[port-1][4] == 1)
-				h26r0_weight1=SampleGram(cMessage[port-1][4]);
+				H26R0_Weight1=SamplePound(cMessage[port-1][4]);
 			else
-				h26r0_weight2=SampleGram(cMessage[port-1][4]);	
+				H26R0_Weight2=SamplePound(cMessage[port-1][4]);	
 			break;
 			
-			case (CODE_H26R0_ZEROCAL):
+		case (CODE_H26R0_ZEROCAL):
 				ZeroCal(cMessage[port-1][4]);
+			break;
+			
+		case (CODE_H26R0_STREAM_RAW):
+			if (cMessage[port-1][4] == 1)
+			{
+					period = ( (uint32_t) cMessage[port-1][5] << 24 ) + ( (uint32_t) cMessage[port-1][6] << 16 ) + ( (uint32_t) cMessage[port-1][7] << 8 ) + cMessage[port-1][8];
+					timeout = ( (uint32_t) cMessage[port-1][9] << 24 ) + ( (uint32_t) cMessage[port-1][10] << 16 ) + ( (uint32_t) cMessage[port-1][11] << 8 ) + cMessage[port-1][12];
+					StreamRawToPort(cMessage[port-1][4], cMessage[port-1][13], cMessage[port-1][14], period, timeout);
+			}else
+				H26R0_Weight2=Average(cMessage[port-1][4],1);	
+			break;
+			
+		case (CODE_H26R0_SAMPLE_RAW):
+			if (cMessage[port-1][4] == 1)
+				H26R0_Weight1=Average(cMessage[port-1][4],1);
+			else
+				H26R0_Weight2=Average(cMessage[port-1][4],1);	
 			break;
 			
 		default:
@@ -425,9 +443,10 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 {
 	float Raw_Msg=0.0f;
   int8_t *pcOutputString;
-  static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %.2f\r\n";
-	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%.2f\r\n";
+  static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %d\r\n";
+	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%d\r\n";
   char *strUnit;
+	
   /* specify the unit */
 	switch (unit)
 	{

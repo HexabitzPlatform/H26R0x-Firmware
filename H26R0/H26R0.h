@@ -83,7 +83,7 @@
 #define START_MEASUREMENT_RANGING     1
 
 /* Module_Status Type Definition */
-#define NUM_MODULE_PARAMS		2
+#define NUM_MODULE_PARAMS		3
 
 /* Module-specific Definitions */
 #define RATE_pin             GPIO_PIN_6
