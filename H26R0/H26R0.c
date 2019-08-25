@@ -598,16 +598,17 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 */
 static void CheckForEnterKey(void)
 {
-  int8_t *pcOutputString;
-
-  pcOutputString = FreeRTOS_CLIGetOutputBuffer();
-  readPxMutex(PcPort, (char *)pcOutputString, sizeof(char), cmd500ms, 100);
-  if ('\r' == pcOutputString[0])
-  {
-    startMeasurementRanging = STOP_MEASUREMENT_RANGING;
-		mode = IDLE_CASE;		                // Stop the streaming task
-	  xTimerStop( xTimer, 0 );            // Stop the timeout timer
-  }
+	// Look for ENTER key to stop the stream
+	for (uint8_t chr=0 ; chr<MSG_RX_BUF_SIZE ; chr++)
+	{
+		if (UARTRxBuf[PcPort-1][chr] == '\r') {
+			UARTRxBuf[PcPort-1][chr] = 0;
+			startMeasurementRanging = STOP_MEASUREMENT_RANGING;
+			mode = IDLE_CASE;		                // Stop the streaming task
+			xTimerStop( xTimer, 0 );            // Stop the timeout timer
+			break;
+		}
+	}
 }
 
 
@@ -1186,7 +1187,7 @@ portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const 
 		writePxMutex(PcPort, (char *)pcWriteBuffer, strlen((char *)pcWriteBuffer), cmd50ms, HAL_MAX_DELAY);
 		StreamKGramToCLI(channel, 500, 10000);
 		/* Wait till the end of stream */
-		while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){};
+		while(startMeasurementRanging != STOP_MEASUREMENT_RANGING){ Delay_ms(1); };
 	}
 	
 	if (result != H26R0_OK || channel != 1 || channel != 2){
