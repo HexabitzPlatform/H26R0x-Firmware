@@ -189,7 +189,7 @@ const CLI_Command_Definition_t zerocalCommandDefinition =
 const CLI_Command_Definition_t weight1CommandDefinition =
 {
   ( const int8_t * ) "weight1", /* The command string to type. */
-		( const int8_t * ) "weight1:\r\nDisplay the value of module parameter: channel_1's weight\r\n\r\n",
+		( const int8_t * ) "weight1:\r\n Display the value of module parameter: channel_1's weight\r\n\r\n",
   weight1ModParamCommand, /* The function to run. */
   0 /* No parameters are expected. */
 };
@@ -199,7 +199,7 @@ const CLI_Command_Definition_t weight1CommandDefinition =
 const CLI_Command_Definition_t weight2CommandDefinition =
 {
   ( const int8_t * ) "weight2", /* The command string to type. */
-		( const int8_t * ) "weight2:\r\nDisplay the value of module parameter: channel_2's weight\r\n\r\n",
+		( const int8_t * ) "weight2:\r\n Display the value of module parameter: channel_2's weight\r\n\r\n",
   weight2ModParamCommand, /* The function to run. */
   0 /* No parameters are expected. */
 };
@@ -209,7 +209,7 @@ const CLI_Command_Definition_t weight2CommandDefinition =
 const CLI_Command_Definition_t dataformatCommandDefinition =
 {
   ( const int8_t * ) "format", /* The command string to type. */
-		( const int8_t * ) " format:\r\nSelect Data format for sending\r\n\r\n",
+		( const int8_t * ) " format:\r\n Select Data format for sending f for float or u for uint\r\n\r\n",
   formatModParamCommand, /* The function to run. */
   1 /* No parameters are expected. */
 };
@@ -1647,12 +1647,12 @@ static portBASE_TYPE formatModParamCommand( int8_t *pcWriteBuffer, size_t xWrite
 
   /* 1st parameter for naming of uart port: P1 to P6 */
   pcParameterString1 = ( int8_t * ) FreeRTOS_CLIGetParameter (pcCommandString, 1, &xParameterStringLength1);
-  if (!strncmp((const char *)pcParameterString1, "0", 1))
+  if (!strncmp((const char *)pcParameterString1, "u", 1))
   {
     H26R0_DATA_FORMAT = FMT_UINT32;      
     strcpy( ( char * ) pcWriteBuffer, ( char * ) "Used data format: uint\r\n" );
   }
-  else if (!strncmp((const char *)pcParameterString1, "1", 1))
+  else if (!strncmp((const char *)pcParameterString1, "f", 1))
   {
     H26R0_DATA_FORMAT = FMT_FLOAT;        
     strcpy( ( char * ) pcWriteBuffer, ( char * ) "Used data format: float\r\n" );
