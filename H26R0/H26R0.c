@@ -1095,9 +1095,9 @@ int ZeroCal(uint8_t Ch)
 	temp32=*(uint32_t*)&Zero_Drift;
 	SetHX711Rate(10);
 	word_LSB=0x0000FFFF & temp32;
-	word_MSB=0xFFFF0000 & temp32;
-	EE_WriteVariable(_EE_cell_output_MSB, word_LSB);
-	EE_WriteVariable(_EE_cell_output_MSB, word_MSB);
+	word_MSB=0x0000FFFF & (temp32>>16); 
+	EE_WriteVariable(_EE_zero_drift_LSB, word_LSB);
+	EE_WriteVariable(_EE_zero_drift_MSB, word_MSB);
 	IND_OFF();
 	
 	return (H26R0_OK);
