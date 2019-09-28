@@ -464,6 +464,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
   static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %d\r\n";
 	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%d\r\n";
   char *strUnit;
+	static uint8_t temp[4];
   /* specify the unit */
 	switch (unit)
 	{
@@ -515,22 +516,6 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		}
 	}
 
-  /* specify the unit */
-	switch (unit)
-	{
-		case Gram: 
-			Raw_Msg=message*Kg2Gram_ratio; break;
-		case KGram:
-			Raw_Msg=message; break;
-		case Ounce:
-			Raw_Msg=message*Kg2Ounce_ratio; break;
-		case Pound:
-			Raw_Msg=message*Kg2Pound_ratio; break;
-		case RAW:
-			Raw_Msg=Average(global_ch, 1);
-		default:
-			Raw_Msg=message; break;
-	}
 
 	// Send the value to appropriate outlet
   switch(mode)
@@ -555,29 +540,40 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 			{
 				RawMsgInt=Raw_Msg*10;
 				if (Module==myID){
-						writePxITMutex(Port, (char *)&RawMsgInt, sizeof(uint32_t), 10);
+						temp[0] = *((__IO uint8_t *)(&RawMsgInt)+3);
+						temp[1] = *((__IO uint8_t *)(&RawMsgInt)+2);
+						temp[2] = *((__IO uint8_t *)(&RawMsgInt)+1);
+						temp[3] = *((__IO uint8_t *)(&RawMsgInt)+0);
+						writePxMutex(Port, (char *)&temp, 4*sizeof(uint8_t), 10, 10);
 				}
 				else{
-						messageParams[0]=Port;
-						memcpy(&messageParams[1], &RawMsgInt, sizeof(uint32_t));
+						messageParams[0] = Port;
+					  messageParams[1] = *((__IO uint8_t *)(&RawMsgInt)+3);
+						messageParams[2] = *((__IO uint8_t *)(&RawMsgInt)+2);
+						messageParams[3] = *((__IO uint8_t *)(&RawMsgInt)+1);
+						messageParams[4] = *((__IO uint8_t *)(&RawMsgInt)+0);
 						SendMessageToModule(Module, CODE_PORT_FORWARD, sizeof(uint32_t)+1);
 				}
 			
 			}
 			else if (H26R0_DATA_FORMAT == FMT_FLOAT)
 			{
-				if (Module==myID){
-						writePxITMutex(Port, (char *)&Raw_Msg, sizeof(float), 10);
+				
+						temp[0] = *((__IO uint8_t *)(&Raw_Msg)+3);
+						temp[1] = *((__IO uint8_t *)(&Raw_Msg)+2);
+						temp[2] = *((__IO uint8_t *)(&Raw_Msg)+1);
+						temp[3] = *((__IO uint8_t *)(&Raw_Msg)+0);
+						writePxMutex(Port, (char *)&temp, 4*sizeof(uint8_t), 10, 10);
 				}
 				else{
-						messageParams[0]=Port;
-						memcpy(&messageParams[1], &Raw_Msg, sizeof(float));
+						messageParams[0] = Port;
+					  messageParams[1] = *((__IO uint8_t *)(&Raw_Msg)+3);
+						messageParams[2] = *((__IO uint8_t *)(&Raw_Msg)+2);
+						messageParams[3] = *((__IO uint8_t *)(&Raw_Msg)+1);
+						messageParams[4] = *((__IO uint8_t *)(&Raw_Msg)+0);
 						SendMessageToModule(Module, CODE_PORT_FORWARD, sizeof(float)+1);
-				
 			}
-		}
-			else
-				
+
       break;
 		
     case SAMPLE_BUFFER_CASE:
