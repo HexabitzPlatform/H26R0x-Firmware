@@ -34,7 +34,7 @@ UART_HandleTypeDef huart6;
 /* Module exported parameters ------------------------------------------------*/
 float H26R0_Weight1 = 0.0f;
 float H26R0_Weight2 = 0.0f;
-uint8_t H26R0_DATA_FORMAT = FMT_UINT32;
+uint8_t H26R0_DATA_FORMAT = FMT_FLOAT;
 module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&H26R0_Weight1, .paramFormat=FMT_FLOAT, .paramName="weight1"} ,
 {.paramPtr=&H26R0_Weight2, .paramFormat=FMT_FLOAT, .paramName="weight2"},
 {.paramPtr=&H26R0_DATA_FORMAT, .paramFormat=FMT_UINT8, .paramName="format"}};
@@ -209,7 +209,7 @@ const CLI_Command_Definition_t weight2CommandDefinition =
 const CLI_Command_Definition_t dataformatCommandDefinition =
 {
   ( const int8_t * ) "format", /* The command string to type. */
-		( const int8_t * ) "(H26R0) format:\r\nSelect Data format for sending\r\n\r\n",
+		( const int8_t * ) " format:\r\nSelect Data format for sending\r\n\r\n",
   formatModParamCommand, /* The function to run. */
   1 /* No parameters are expected. */
 };
