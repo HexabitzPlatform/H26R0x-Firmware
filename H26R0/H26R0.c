@@ -461,8 +461,10 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 	float Raw_Msg=0.0f;
 	uint32_t RawMsgInt=0;
   int8_t *pcOutputString;
-  static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %d\r\n";
-	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%d\r\n";
+  static const int8_t *pcWeightMsg = ( int8_t * ) "Weight (%s): %f\r\n";
+	static const int8_t *pcWeightVerboseMsg = ( int8_t * ) "%f\r\n";	
+  static const int8_t *pcWeightMsgUINT = ( int8_t * ) "Weight (%s): %d\r\n";
+	static const int8_t *pcWeightVerboseMsgUINT = ( int8_t * ) "%d\r\n";
   char *strUnit;
 	static uint8_t temp[4];
   /* specify the unit */
@@ -522,16 +524,36 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
   {
     case SAMPLE_CLI_CASE:
     case STREAM_CLI_CASE:
+			if (H26R0_DATA_FORMAT == FMT_UINT32)
+			{
+			RawMsgInt=Raw_Msg*10;
+      sprintf( ( char * ) pcOutputString, ( char * ) pcWeightMsgUINT, strUnit, RawMsgInt);
+      writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
+			CheckForEnterKey();
+			}
+			else if (H26R0_DATA_FORMAT == FMT_FLOAT)
+			{
       sprintf( ( char * ) pcOutputString, ( char * ) pcWeightMsg, strUnit, Raw_Msg);
       writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
 			CheckForEnterKey();
+			}
       break;
 
     case SAMPLE_CLI_VERBOSE_CASE:
     case STREAM_CLI_VERBOSE_CASE:
+			if (H26R0_DATA_FORMAT == FMT_UINT32)
+			{
+			RawMsgInt=Raw_Msg*10;
+      sprintf( ( char * ) pcOutputString, ( char * ) pcWeightVerboseMsgUINT, RawMsgInt);
+      writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
+			CheckForEnterKey();
+			}
+			else if (H26R0_DATA_FORMAT == FMT_FLOAT)
+			{
       sprintf( ( char * ) pcOutputString, ( char * ) pcWeightVerboseMsg, Raw_Msg);
       writePxMutex(PcPort, (char *)pcOutputString, strlen((char *)pcOutputString), cmd500ms, HAL_MAX_DELAY);
 			CheckForEnterKey();
+			}
       break;
 		
     case SAMPLE_PORT_CASE:
@@ -558,7 +580,6 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 			}
 			else if (H26R0_DATA_FORMAT == FMT_FLOAT)
 			{
-				
 						temp[0] = *((__IO uint8_t *)(&Raw_Msg)+3);
 						temp[1] = *((__IO uint8_t *)(&Raw_Msg)+2);
 						temp[2] = *((__IO uint8_t *)(&Raw_Msg)+1);
