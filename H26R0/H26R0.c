@@ -580,6 +580,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 			}
 			else if (H26R0_DATA_FORMAT == FMT_FLOAT)
 			{
+				if (Module==myID){ 
 						temp[0] = *((__IO uint8_t *)(&Raw_Msg)+3);
 						temp[1] = *((__IO uint8_t *)(&Raw_Msg)+2);
 						temp[2] = *((__IO uint8_t *)(&Raw_Msg)+1);
@@ -594,6 +595,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 						messageParams[4] = *((__IO uint8_t *)(&Raw_Msg)+0);
 						SendMessageToModule(Module, CODE_PORT_FORWARD, sizeof(float)+1);
 			}
+		}
 
       break;
 		
