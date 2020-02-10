@@ -68,7 +68,7 @@ module_param_t modParam[NUM_MODULE_PARAMS] = {{.paramPtr=&H26R0_Weight1, .paramF
 uint8_t pulses=0, rate=0, gain=128;
 uint16_t full_scale=0;
 uint32_t Data=0, value=0;
-uint8_t global_ch, global_port, global_module, mode, unit=KGram;
+uint8_t global_ch, global_port, global_module, global_mode, unit=KGram;
 uint32_t global_period, global_timeout;
 float weight1_buffer, weight2_buffer; float *ptr_weight_buffer;
 float valuef = 0.0f, rawvalue=0.0f;
@@ -229,6 +229,7 @@ void Module_Init(void)
 	MX_USART4_UART_Init();
   MX_USART5_UART_Init();
   MX_USART6_UART_Init();
+	UpdateBaudrate(P3, 19200);
 	
 	/* HX711 */
 	HX711_GPIO_Init();     // GPIO init
@@ -295,7 +296,7 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			break;
 		
 		case (CODE_H26R0_STOP):
-			mode=IDLE_CASE;
+			global_mode=IDLE_CASE;
 			PowerDown();
 			xTimerStop( xTimer, portMAX_DELAY );
 			break;
@@ -487,7 +488,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
   /* Get CLI output buffer */
   pcOutputString = FreeRTOS_CLIGetOutputBuffer();
 
-	if (mode != STREAM_CLI_VERBOSE_CASE && mode != STREAM_PORT_CASE)
+	if (Mode != STREAM_CLI_VERBOSE_CASE && Mode != STREAM_PORT_CASE)
 	{
 		strUnit = malloc(6*sizeof(char));
 		memset(strUnit, 0, (6*sizeof(char)));
@@ -520,7 +521,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 
 
 	// Send the value to appropriate outlet
-  switch(mode)
+  switch(Mode)
   {
     case SAMPLE_CLI_CASE:
     case STREAM_CLI_CASE:
@@ -605,7 +606,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
       memcpy(Buffer, &Raw_Msg, sizeof(float));
       break;
 	}	
-	if (mode != STREAM_CLI_VERBOSE_CASE && mode != STREAM_PORT_CASE){
+	if (Mode != STREAM_CLI_VERBOSE_CASE && Mode != STREAM_PORT_CASE){
 		free(strUnit);
 	}
 	return (H26R0_OK);
@@ -623,7 +624,7 @@ static void CheckForEnterKey(void)
 		if (UARTRxBuf[PcPort-1][chr] == '\r') {
 			UARTRxBuf[PcPort-1][chr] = 0;
 			startMeasurementRanging = STOP_MEASUREMENT_RANGING;
-			mode = IDLE_CASE;		                // Stop the streaming task
+			global_mode = IDLE_CASE;		                // Stop the streaming task
 			xTimerStop( xTimer, 0 );            // Stop the timeout timer
 			break;
 		}
@@ -640,37 +641,37 @@ void LoadcellTask(void * argument)
 	uint32_t t0=0;
 	while(1)
 	{
-		switch(mode)
+		switch(global_mode)
 		{
 			case STREAM_CLI_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);		
-				SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+				SendResults(DATA_To_SEND, global_mode, unit, 0, 0, NULL);
 				while(HAL_GetTick()-t0<(global_period-1)) {taskYIELD();}
 				break;
 				
 			case STREAM_CLI_VERBOSE_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
-				SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+				SendResults(DATA_To_SEND, global_mode, unit, 0, 0, NULL);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
 				break;
 				
 			case STREAM_PORT_CASE:
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
-				SendResults(DATA_To_SEND, mode, unit, global_port, global_module, NULL);
+				SendResults(DATA_To_SEND, global_mode, unit, global_port, global_module, NULL);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
 				break;
 				
 			case STREAM_BUFFER_CASE: 
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
-				SendResults(DATA_To_SEND, unit, mode, 0, 0, ptr_weight_buffer);
+				SendResults(DATA_To_SEND, unit, global_mode, 0, 0, ptr_weight_buffer);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
 				break;
 				
-			default: mode = IDLE_CASE; break;
+			default: global_mode = IDLE_CASE; break;
 		}
 		
 		taskYIELD();
@@ -689,7 +690,7 @@ static void HandleTimeout(TimerHandle_t xTimer)
   tid = ( uint32_t ) pvTimerGetTimerID( xTimer );
   if (TIMERID_TIMEOUT_MEASUREMENT == tid)
   {
-		mode = IDLE_CASE;		                                    // Stop the streaming task
+		global_mode = IDLE_CASE;		                                    // Stop the streaming task
 		startMeasurementRanging = STOP_MEASUREMENT_RANGING;     // stop streaming
   }
 }
@@ -819,7 +820,7 @@ int StreamGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, 
 	global_module=Module;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_PORT_CASE;
+	global_mode=STREAM_PORT_CASE;
 	unit=Gram;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -843,7 +844,7 @@ int StreamKGramToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_module=Module;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_PORT_CASE;
+	global_mode=STREAM_PORT_CASE;
 	unit=KGram;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -867,7 +868,7 @@ int StreamOunceToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_module=Module;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_PORT_CASE;
+	global_mode=STREAM_PORT_CASE;
 	unit=Ounce;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -891,7 +892,7 @@ int StreamPoundToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period,
 	global_module=Module;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_PORT_CASE;
+	global_mode=STREAM_PORT_CASE;
 	unit=Pound;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -913,7 +914,7 @@ int StreamKGramToCLI(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_CLI_CASE;
+	global_mode=STREAM_CLI_CASE;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 		/* start software timer which will create event timeout */
@@ -940,7 +941,7 @@ int StreamKGramToVERBOSE(uint8_t Ch, uint32_t Period, uint32_t Timeout)
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_CLI_VERBOSE_CASE;
+	global_mode=STREAM_CLI_VERBOSE_CASE;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
 	  /* start software timer which will create event timeout */
@@ -963,7 +964,7 @@ int StreamRawToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, u
 	global_ch=Ch;
 	global_period=Period;
 	global_timeout=Timeout;
-	mode=STREAM_PORT_CASE;
+	global_mode=STREAM_PORT_CASE;
 	unit=RAW;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -990,7 +991,7 @@ int StreamGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Time
 	global_period=Period;
 	global_timeout=Timeout;
 	ptr_weight_buffer=Buffer;
-	mode=STREAM_BUFFER_CASE;
+	global_mode=STREAM_BUFFER_CASE;
 	unit=Gram;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -1014,7 +1015,7 @@ int StreamKGramToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	global_period=Period;
 	global_timeout=Timeout;
 	ptr_weight_buffer=Buffer;
-	mode=STREAM_BUFFER_CASE;
+	global_mode=STREAM_BUFFER_CASE;
 	unit=KGram;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -1038,7 +1039,7 @@ int StreamOunceToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	global_period=Period;
 	global_timeout=Timeout;
 	ptr_weight_buffer=Buffer;
-	mode=STREAM_BUFFER_CASE;
+	global_mode=STREAM_BUFFER_CASE;
 	unit=Ounce;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -1062,7 +1063,7 @@ int StreamPoundToBuffer(uint8_t Ch, float *Buffer, uint32_t Period, uint32_t Tim
 	global_period=Period;
 	global_timeout=Timeout;
 	ptr_weight_buffer=Buffer;
-	mode=STREAM_BUFFER_CASE;
+	global_mode=STREAM_BUFFER_CASE;
 	unit=Pound;
 	if ((global_timeout > 0) && (global_timeout < 0xFFFFFFFF))
   {
@@ -1132,7 +1133,7 @@ int ZeroCal(uint8_t Ch)
 */
 int Stop(void)
 {
-	mode=IDLE_CASE;
+	global_mode=IDLE_CASE;
   PowerDown();
 	xTimerStop( xTimer, 0 );
 	weight1_buffer=0;
@@ -1253,8 +1254,8 @@ static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLe
 	if (channel == 1 || channel == 2)
 	{
 		DATA_To_SEND=SampleKGram(channel);
-		mode=SAMPLE_CLI_CASE;
-		SendResults(DATA_To_SEND, mode, unit, 0, 0, NULL);
+		global_mode=SAMPLE_CLI_CASE;
+		SendResults(DATA_To_SEND, global_mode, unit, 0, 0, NULL);
 	}
 	
 		if (result != H26R0_OK || channel != 1 || channel != 2 )
