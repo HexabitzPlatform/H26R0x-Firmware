@@ -1,5 +1,5 @@
 /*
-    BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
+    BitzOS (BOS) V0.2.0 - Copyright (C) 2017-2019 Hexabitz
     All rights reserved
 		
     File Name     : H26R0.h
@@ -13,6 +13,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "BOS.h"
+#include "H26R0_MemoryMap.h"	
 #include "H26R0_uart.h"	
 #include "H26R0_gpio.h"	
 #include "H26R0_dma.h"	
@@ -82,13 +83,22 @@
 #define START_MEASUREMENT_RANGING     1
 
 /* Module_Status Type Definition */
-#define NUM_MODULE_PARAMS		2
+#define NUM_MODULE_PARAMS		3
 
 /* Module-specific Definitions */
 #define RATE_pin             GPIO_PIN_6
 #define DOUT                 GPIO_PIN_10
 #define PD_SCK               GPIO_PIN_9
 #define TIMERID_TIMEOUT_MEASUREMENT   0xFF
+
+// Module EEPROM variables addresses - Module Addressing Space 500 - 599
+#define _EE_cell_full_scale		500
+#define _EE_cell_drift_LSB		501
+#define _EE_cell_drift_MSB		502
+#define _EE_cell_output_LSB		503
+#define _EE_cell_output_MSB		504
+#define _EE_zero_drift_LSB		505
+#define _EE_zero_drift_MSB		506
 
 
 /* H26R0_Status Type Definition */  
@@ -120,24 +130,6 @@ extern void MX_USART4_UART_Init(void);
 extern void MX_USART5_UART_Init(void);
 extern void MX_USART6_UART_Init(void);
 
-
-
-/* -----------------------------------------------------------------------
-	|														Message Codes	 														 	|
-   ----------------------------------------------------------------------- 
-*/
-
-#define CODE_H26R0_SET_RATE               2600
-#define CODE_H26R0_STREAM_PORT_GRAM       2601
-#define CODE_H26R0_STREAM_PORT_KGRAM      2602
-#define CODE_H26R0_STREAM_PORT_OUNCE      2603
-#define CODE_H26R0_STREAM_PORT_POUND      2604
-#define CODE_H26R0_STOP                   2605
-#define CODE_H26R0_SAMPLE_GRAM            2606
-#define CODE_H26R0_SAMPLE_KGRAM           2607
-#define CODE_H26R0_SAMPLE_OUNCE           2608
-#define CODE_H26R0_SAMPLE_POUND           2609
- 
 
 	
 /* -----------------------------------------------------------------------

@@ -33,7 +33,7 @@
   */
 	
 /*
-		MODIFIED by Hexabitz for BitzOS (BOS) V0.1.5 - Copyright (C) 2017-2018 Hexabitz
+		MODIFIED by Hexabitz for BitzOS (BOS) V0.2.0 - Copyright (C) 2017-2018 Hexabitz
     All rights reserved
 */
 
@@ -48,7 +48,7 @@
 #include "stm32f0xx_hal.h"
 
 
-extern void MX_GPIO_Init(void);
+extern void GPIO_Init(void);
 extern void IND_LED_Init(void);
 extern void HX711_GPIO_Init(void);
 
