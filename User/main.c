@@ -41,6 +41,8 @@
 
 
 /* Private variables ---------------------------------------------------------*/
+float weight=0.0;
+varFormat_t format1;
 
 /* Private function prototypes -----------------------------------------------*/
 
