@@ -32,7 +32,7 @@
   */
 	
 /*
-		MODIFIED by Hexabitz for BitzOS (BOS) V0.2.0 - Copyright (C) 2017-2018 Hexabitz
+		MODIFIED by Hexabitz for BitzOS (BOS) V0.2.1 - Copyright (C) 2017-2020 Hexabitz
     All rights reserved
 */
 
@@ -41,8 +41,7 @@
 
 
 /* Private variables ---------------------------------------------------------*/
-float weight=0.0;
-varFormat_t format1;
+
 
 /* Private function prototypes -----------------------------------------------*/
 

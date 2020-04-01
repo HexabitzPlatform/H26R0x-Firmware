@@ -1,5 +1,5 @@
 /*
-    BitzOS (BOS) V0.2.0 - Copyright (C) 2017-2019 Hexabitz
+    BitzOS (BOS) V0.2.1 - Copyright (C) 2017-2020 Hexabitz
     All rights reserved
 
     File Name     : H26R0.c
@@ -229,7 +229,6 @@ void Module_Init(void)
 	MX_USART4_UART_Init();
   MX_USART5_UART_Init();
   MX_USART6_UART_Init();
-	UpdateBaudrate(P3, 19200);
 	
 	/* HX711 */
 	HX711_GPIO_Init();     // GPIO init
@@ -667,7 +666,7 @@ void LoadcellTask(void * argument)
 			case STREAM_BUFFER_CASE: 
 				t0=HAL_GetTick();
 				DATA_To_SEND=SampleKGram(global_ch);	
-				SendResults(DATA_To_SEND, unit, global_mode, 0, 0, ptr_weight_buffer);
+				SendResults(DATA_To_SEND, global_mode, unit, 0, 0, ptr_weight_buffer);
 				while(HAL_GetTick()-t0<global_period) {taskYIELD();}
 				break;
 				
