@@ -39,7 +39,7 @@
 ;
 ;*******************************************************************************	
 ;
-;		MODIFIED by Hexabitz for BitzOS (BOS) V0.2.1 - Copyright (C) 2017-2018 Hexabitz
+;		MODIFIED by Hexabitz for BitzOS (BOS) V0.2.1 - Copyright (C) 2020-2021 Hexabitz
 ;    All rights reserved
 ;
 
