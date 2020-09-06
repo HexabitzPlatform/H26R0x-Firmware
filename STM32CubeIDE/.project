@@ -217,9 +217,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/User/project.h</locationURI>
 		</link>
 		<link>
-			<name>User/topology_ex.h</name>
+			<name>User/topology_1.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/User/topology_ex.h</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/User/topology_1.h</locationURI>
 		</link>
 		<link>
 			<name>H26R0/gcc/startup_stm32f091xc.s</name>
