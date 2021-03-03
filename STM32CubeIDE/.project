@@ -202,9 +202,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/H26R0/H26R0_uart.h</locationURI>
 		</link>
 		<link>
-			<name>H26R0/gcc</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
+			<name>H26R0/startup_stm32f091xc.s</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/H26R0/startup_stm32f091xc.s</locationURI>
 		</link>
 		<link>
 			<name>H26R0/stm32f0xx_hal_conf.h</name>
@@ -250,11 +250,6 @@
 			<name>User/topology_1.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/User/topology_1.h</locationURI>
-		</link>
-		<link>
-			<name>H26R0/gcc/startup_stm32f091xc.s</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/H26R0/gcc/startup_stm32f091xc.s</locationURI>
 		</link>
 		<link>
 			<name>Thirdparty/CMSIS/Device</name>

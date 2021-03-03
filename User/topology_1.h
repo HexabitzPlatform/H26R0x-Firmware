@@ -1,5 +1,5 @@
 /*
-    BitzOS (BOS) V0.2.4 - Copyright (C) 2021 Hexabitz
+    BitzOS (BOS) V0.2.4 - Copyright (C) 2017-2021 Hexabitz
     All rights reserved
 
     File Name     : topology_1.h
@@ -25,8 +25,8 @@
 
 // Topology
 static uint16_t array[__N][7] = {
-{ _H26R0, 0, 0, _mod2|P5, 0, 0, 0},							// Module 1
-{ _H01R0, 0, 0, 0, 0, _mod1|P3, 0},			        // Module 2
+{ _H26R0, 0, 0,0, 0, 0,  _mod2|P5},							// Module 1
+{ _H01R0, 0, 0, 0, 0, _mod1|P5, 0},			        // Module 2
 };
 
 // Configurations for duplex serial ports
@@ -36,8 +36,8 @@ static uint16_t array[__N][7] = {
 	#define	_P2pol_normal	1
 	#define	_P3pol_normal	1
 	#define	_P4pol_normal	1
-	#define	_P4pol_normal	1
-	#define	_P4pol_normal	1
+	#define	_P5pol_normal	1
+	#define	_P6pol_reversed	1
 #endif
 
 #if ( _module == 2 )
@@ -46,8 +46,8 @@ static uint16_t array[__N][7] = {
 	#define	_P2pol_normal	1
 	#define	_P3pol_normal	1
 	#define	_P4pol_normal	1
-	#define	_P4pol_reversed	1
-	#define	_P4pol_normal	1
+	#define	_P5pol_normal	1
+	#define	_P6pol_normal	1
 
 #endif
 
