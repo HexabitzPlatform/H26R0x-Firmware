@@ -1,0 +1,13 @@
+H26R0_it.c:59:6:SysTick_Handler	8	static
+H26R0_it.c:70:6:HardFault_Handler	0	static
+H26R0_it.c:86:6:USART1_IRQHandler	0	static
+H26R0_it.c:105:6:USART2_IRQHandler	8	static
+H26R0_it.c:124:6:USART3_8_IRQHandler	8	static
+H26R0_it.c:153:6:DMA1_Ch1_IRQHandler	8	static
+H26R0_it.c:165:6:DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler	8	static
+H26R0_it.c:184:6:DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler	8	static
+H26R0_it.c:206:6:HAL_UART_TxCpltCallback	16	static
+H26R0_it.c:220:6:HAL_UART_ErrorCallback	8	static
+H26R0_it.c:240:6:HAL_UART_RxCpltCallback	8	static
+H26R0_it.c:257:6:vApplicationStackOverflowHook	0	static,ignoring_inline_asm
+H26R0_it.c:270:6:vApplicationMallocFailedHook	0	static,ignoring_inline_asm
