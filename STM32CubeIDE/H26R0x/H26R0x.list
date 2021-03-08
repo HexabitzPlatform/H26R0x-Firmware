@@ -7,23 +7,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         0001a444  080000bc  080000bc  000100bc  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00003800  0801a500  0801a500  0002a500  2**3
+  2 .rodata       000037f8  0801a500  0801a500  0002a500  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  0801dd00  0801dd00  00030a84  2**0
+  3 .ARM.extab    00000000  0801dcf8  0801dcf8  00030a84  2**0
                   CONTENTS
-  4 .ARM          00000008  0801dd00  0801dd00  0002dd00  2**2
+  4 .ARM          00000008  0801dcf8  0801dcf8  0002dcf8  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  0801dd08  0801dd08  00030a84  2**0
+  5 .preinit_array 00000000  0801dd00  0801dd00  00030a84  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000008  0801dd08  0801dd08  0002dd08  2**2
+  6 .init_array   00000008  0801dd00  0801dd00  0002dd00  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .fini_array   00000004  0801dd10  0801dd10  0002dd10  2**2
+  7 .fini_array   00000004  0801dd08  0801dd08  0002dd08  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         00000a84  20000000  0801dd14  00030000  2**3
+  8 .data         00000a84  20000000  0801dd0c  00030000  2**3
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          00006780  20000a88  0801e798  00030a88  2**3
+  9 .bss          00006780  20000a88  0801e790  00030a88  2**3
                   ALLOC
- 10 ._user_heap_stack 00000600  20007208  0801e798  00037208  2**0
+ 10 ._user_heap_stack 00000600  20007208  0801e790  00037208  2**0
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00030a84  2**0
                   CONTENTS, READONLY
@@ -11121,7 +11121,7 @@ void StringToLowerCase(char *string)
 }
  8004ec4:	bd30      	pop	{r4, r5, pc}
  8004ec6:	46c0      	nop			; (mov r8, r8)
- 8004ec8:	0801d8a1 	.word	0x0801d8a1
+ 8004ec8:	0801d895 	.word	0x0801d895
 
 08004ecc <ParseSnippetCondition>:
 /*-----------------------------------------------------------*/
@@ -12398,7 +12398,7 @@ BOS_Status ParseSnippetCondition(char *string)
  80057e8:	0801ad34 	.word	0x0801ad34
  80057ec:	0801abe8 	.word	0x0801abe8
  80057f0:	0801ac8c 	.word	0x0801ac8c
- 80057f4:	0801d8a1 	.word	0x0801d8a1
+ 80057f4:	0801d895 	.word	0x0801d895
  80057f8:	0801ad2c 	.word	0x0801ad2c
  80057fc:	20006d18 	.word	0x20006d18
  8005800:	20000aa7 	.word	0x20000aa7
@@ -33440,7 +33440,7 @@ BOS_Status RTC_CalendarConfig(void)
  800e7ec:	24ff      	movs	r4, #255	; 0xff
  800e7ee:	e7f5      	b.n	800e7dc <RTC_CalendarConfig+0xcc>
  800e7f0:	0801a744 	.word	0x0801a744
- 800e7f4:	0801d68c 	.word	0x0801d68c
+ 800e7f4:	0801a768 	.word	0x0801a768
  800e7f8:	20000020 	.word	0x20000020
  800e7fc:	200070cc 	.word	0x200070cc
  800e800:	20006d18 	.word	0x20006d18
@@ -34585,7 +34585,7 @@ UART_HandleTypeDef* GetUart(uint8_t port)
 			return P1uart;	
  800edf8:	4805      	ldr	r0, [pc, #20]	; (800ee10 <GetUart+0x38>)
  800edfa:	e7f4      	b.n	800ede6 <GetUart+0xe>
- 800edfc:	0801d698 	.word	0x0801d698
+ 800edfc:	0801d68c 	.word	0x0801d68c
  800ee00:	20007030 	.word	0x20007030
  800ee04:	20006f4c 	.word	0x20006f4c
  800ee08:	20006df0 	.word	0x20006df0
@@ -34955,7 +34955,7 @@ LoopForever:
   ldr   r0, =_estack
  800efd4:	20008000 	.word	0x20008000
   ldr r3, =_sidata
- 800efd8:	0801dd14 	.word	0x0801dd14
+ 800efd8:	0801dd0c 	.word	0x0801dd0c
   ldr r0, =_sdata
  800efdc:	20000000 	.word	0x20000000
   ldr r3, =_edata
@@ -35604,8 +35604,8 @@ int8_t cParameters = 0;
  800f2a6:	e7e9      	b.n	800f27c <FreeRTOS_CLIProcessCommand+0xd8>
  800f2a8:	200020a4 	.word	0x200020a4
  800f2ac:	200000c0 	.word	0x200000c0
- 800f2b0:	0801d708 	.word	0x0801d708
- 800f2b4:	0801d6b0 	.word	0x0801d6b0
+ 800f2b0:	0801d6fc 	.word	0x0801d6fc
+ 800f2b4:	0801d6a4 	.word	0x0801d6a4
 
 0800f2b8 <FreeRTOS_CLIGetOutputBuffer>:
 }
@@ -37930,7 +37930,7 @@ TCB_t *pxTCB;
  800ffaa:	b005      	add	sp, #20
  800ffac:	bd00      	pop	{pc}
  800ffae:	46c0      	nop			; (mov r8, r8)
- 800ffb0:	0801d7ec 	.word	0x0801d7ec
+ 800ffb0:	0801d7e0 	.word	0x0801d7e0
  800ffb4:	08010241 	.word	0x08010241
  800ffb8:	200021a4 	.word	0x200021a4
  800ffbc:	200021d0 	.word	0x200021d0
@@ -38589,7 +38589,7 @@ BaseType_t xAlreadyYielded = pdFALSE;
  801043c:	200021d4 	.word	0x200021d4
  8010440:	20002148 	.word	0x20002148
  8010444:	200020b0 	.word	0x200020b0
- 8010448:	0801d81c 	.word	0x0801d81c
+ 8010448:	0801d810 	.word	0x0801d810
  801044c:	20002160 	.word	0x20002160
  8010450:	200020bc 	.word	0x200020bc
 
@@ -39160,7 +39160,7 @@ BaseType_t xAlreadyYielded = pdFALSE;
  80107c0:	46b0      	mov	r8, r6
  80107c2:	bdf0      	pop	{r4, r5, r6, r7, pc}
  80107c4:	2000214c 	.word	0x2000214c
- 80107c8:	0801d7f4 	.word	0x0801d7f4
+ 80107c8:	0801d7e8 	.word	0x0801d7e8
 
 080107cc <vTaskGetRunTimeStats>:
 /*----------------------------------------------------------*/
@@ -39301,8 +39301,8 @@ BaseType_t xAlreadyYielded = pdFALSE;
  8010880:	e7d5      	b.n	801082e <vTaskGetRunTimeStats+0x62>
  8010882:	46c0      	nop			; (mov r8, r8)
  8010884:	2000214c 	.word	0x2000214c
- 8010888:	0801d810 	.word	0x0801d810
- 801088c:	0801d804 	.word	0x0801d804
+ 8010888:	0801d804 	.word	0x0801d804
+ 801088c:	0801d7f8 	.word	0x0801d7f8
 
 08010890 <pvTaskIncrementMutexHeldCount>:
 
@@ -39735,7 +39735,7 @@ static void prvCheckForValidListAndQueue( void )
  8010a98:	200021f4 	.word	0x200021f4
  8010a9c:	200021d8 	.word	0x200021d8
  8010aa0:	200021dc 	.word	0x200021dc
- 8010aa4:	0801d830 	.word	0x0801d830
+ 8010aa4:	0801d824 	.word	0x0801d824
 
 08010aa8 <xTimerCreateTimerTask>:
 {
@@ -39769,7 +39769,7 @@ static void prvCheckForValidListAndQueue( void )
  8010ad8:	b005      	add	sp, #20
  8010ada:	bd00      	pop	{pc}
  8010adc:	2000220c 	.word	0x2000220c
- 8010ae0:	0801d838 	.word	0x0801d838
+ 8010ae0:	0801d82c 	.word	0x0801d82c
  8010ae4:	08010c31 	.word	0x08010c31
 
 08010ae8 <xTimerCreate>:
@@ -40184,7 +40184,7 @@ Timer_t * const pxTimer = ( Timer_t * ) listGET_OWNER_OF_HEAD_ENTRY( pxCurrentTi
 			( void ) xTaskResumeAll();
  8010d8e:	f7ff f9bf 	bl	8010110 <xTaskResumeAll>
  8010d92:	e76d      	b.n	8010c70 <prvTimerTask+0x40>
- 8010d94:	0801d840 	.word	0x0801d840
+ 8010d94:	0801d834 	.word	0x0801d834
  8010d98:	200021d8 	.word	0x200021d8
  8010d9c:	2000220c 	.word	0x2000220c
 
@@ -45306,8 +45306,8 @@ uint32_t HAL_RCC_GetSysClockFreq(void)
  8012bca:	4360      	muls	r0, r4
  8012bcc:	e7d9      	b.n	8012b82 <HAL_RCC_GetSysClockFreq+0x3a>
  8012bce:	46c0      	nop			; (mov r8, r8)
- 8012bd0:	0801d868 	.word	0x0801d868
- 8012bd4:	0801d87c 	.word	0x0801d87c
+ 8012bd0:	0801d85c 	.word	0x0801d85c
+ 8012bd4:	0801d870 	.word	0x0801d870
  8012bd8:	40021000 	.word	0x40021000
  8012bdc:	fd9da600 	.word	0xfd9da600
  8012be0:	02dc6c00 	.word	0x02dc6c00
@@ -45337,7 +45337,7 @@ uint32_t HAL_RCC_GetHCLKFreq(void)
  8012c00:	bd10      	pop	{r4, pc}
  8012c02:	46c0      	nop			; (mov r8, r8)
  8012c04:	40021000 	.word	0x40021000
- 8012c08:	0801d890 	.word	0x0801d890
+ 8012c08:	0801d884 	.word	0x0801d884
  8012c0c:	200000b8 	.word	0x200000b8
 
 08012c10 <HAL_RCC_GetPCLK1Freq>:
@@ -45362,7 +45362,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  8012c24:	bd10      	pop	{r4, pc}
  8012c26:	46c0      	nop			; (mov r8, r8)
  8012c28:	40021000 	.word	0x40021000
- 8012c2c:	0801d890 	.word	0x0801d890
+ 8012c2c:	0801d884 	.word	0x0801d884
 
 08012c30 <HAL_RCCEx_PeriphCLKConfig>:
   *         the backup registers) and RCC_BDCR register are set to their reset values.
@@ -48850,10 +48850,10 @@ void UserTask(void * argument)
  8013e8e:	4798      	blx	r3
  8013e90:	3601      	adds	r6, #1
  8013e92:	e7f2      	b.n	8013e7a <__libc_init_array+0x1e>
- 8013e94:	0801dd08 	.word	0x0801dd08
- 8013e98:	0801dd08 	.word	0x0801dd08
- 8013e9c:	0801dd08 	.word	0x0801dd08
- 8013ea0:	0801dd10 	.word	0x0801dd10
+ 8013e94:	0801dd00 	.word	0x0801dd00
+ 8013e98:	0801dd00 	.word	0x0801dd00
+ 8013e9c:	0801dd00 	.word	0x0801dd00
+ 8013ea0:	0801dd08 	.word	0x0801dd08
 
 08013ea4 <malloc>:
  8013ea4:	b510      	push	{r4, lr}
@@ -50391,8 +50391,8 @@ void UserTask(void * argument)
  8014aca:	2200      	movs	r2, #0
  8014acc:	e032      	b.n	8014b34 <_strtod_l+0x328>
  8014ace:	46c0      	nop			; (mov r8, r8)
- 8014ad0:	0801db34 	.word	0x0801db34
- 8014ad4:	0801d9a8 	.word	0x0801d9a8
+ 8014ad0:	0801db2c 	.word	0x0801db2c
+ 8014ad4:	0801d99c 	.word	0x0801d99c
  8014ad8:	ffefffff 	.word	0xffefffff
  8014adc:	00000433 	.word	0x00000433
  8014ae0:	7ff00000 	.word	0x7ff00000
@@ -50755,15 +50755,15 @@ void UserTask(void * argument)
  8014dd8:	d18f      	bne.n	8014cfa <_strtod_l+0x4ee>
  8014dda:	e55e      	b.n	801489a <_strtod_l+0x8e>
  8014ddc:	00004e1f 	.word	0x00004e1f
- 8014de0:	0801da05 	.word	0x0801da05
- 8014de4:	0801d9bc 	.word	0x0801d9bc
+ 8014de0:	0801d9fd 	.word	0x0801d9fd
+ 8014de4:	0801d9b0 	.word	0x0801d9b0
  8014de8:	7ff00000 	.word	0x7ff00000
- 8014dec:	0801d9fd 	.word	0x0801d9fd
- 8014df0:	0801da53 	.word	0x0801da53
- 8014df4:	0801dcdf 	.word	0x0801dcdf
- 8014df8:	0801dbd0 	.word	0x0801dbd0
+ 8014dec:	0801d9f5 	.word	0x0801d9f5
+ 8014df0:	0801da4b 	.word	0x0801da4b
+ 8014df4:	0801dcd7 	.word	0x0801dcd7
+ 8014df8:	0801dbc8 	.word	0x0801dbc8
  8014dfc:	fcb00000 	.word	0xfcb00000
- 8014e00:	0801dba8 	.word	0x0801dba8
+ 8014e00:	0801dba0 	.word	0x0801dba0
  8014e04:	7ca00000 	.word	0x7ca00000
  8014e08:	7c900000 	.word	0x7c900000
  8014e0c:	7fefffff 	.word	0x7fefffff
@@ -51164,7 +51164,7 @@ void UserTask(void * argument)
  801514a:	2b00      	cmp	r3, #0
  801514c:	d196      	bne.n	801507c <_strtod_l+0x870>
  801514e:	e5d4      	b.n	8014cfa <_strtod_l+0x4ee>
- 8015150:	0801d9d0 	.word	0x0801d9d0
+ 8015150:	0801d9c8 	.word	0x0801d9c8
  8015154:	fffffc02 	.word	0xfffffc02
  8015158:	7ff00000 	.word	0x7ff00000
  801515c:	39500000 	.word	0x39500000
@@ -51709,7 +51709,7 @@ void UserTask(void * argument)
  80155f2:	260a      	movs	r6, #10
  80155f4:	e7a1      	b.n	801553a <_strtol_l.isra.0+0x56>
  80155f6:	46c0      	nop			; (mov r8, r8)
- 80155f8:	0801d8a1 	.word	0x0801d8a1
+ 80155f8:	0801d895 	.word	0x0801d895
  80155fc:	7fffffff 	.word	0x7fffffff
 
 08015600 <strtol>:
@@ -52442,13 +52442,13 @@ void UserTask(void * argument)
  8015c4e:	9309      	str	r3, [sp, #36]	; 0x24
  8015c50:	e012      	b.n	8015c78 <_svfprintf_r+0x660>
  8015c52:	46c0      	nop			; (mov r8, r8)
- 8015c54:	0801da2c 	.word	0x0801da2c
- 8015c58:	0801da3c 	.word	0x0801da3c
+ 8015c54:	0801da24 	.word	0x0801da24
+ 8015c58:	0801da34 	.word	0x0801da34
  8015c5c:	7fefffff 	.word	0x7fefffff
- 8015c60:	0801d9f8 	.word	0x0801d9f8
- 8015c64:	0801d9fc 	.word	0x0801d9fc
- 8015c68:	0801da00 	.word	0x0801da00
- 8015c6c:	0801da04 	.word	0x0801da04
+ 8015c60:	0801d9f0 	.word	0x0801d9f0
+ 8015c64:	0801d9f4 	.word	0x0801d9f4
+ 8015c68:	0801d9f8 	.word	0x0801d9f8
+ 8015c6c:	0801d9fc 	.word	0x0801d9fc
  8015c70:	2300      	movs	r3, #0
  8015c72:	930c      	str	r3, [sp, #48]	; 0x30
  8015c74:	ab3f      	add	r3, sp, #252	; 0xfc
@@ -52876,8 +52876,8 @@ void UserTask(void * argument)
  8015fde:	9309      	str	r3, [sp, #36]	; 0x24
  8015fe0:	2367      	movs	r3, #103	; 0x67
  8015fe2:	e7da      	b.n	8015f9a <_svfprintf_r+0x982>
- 8015fe4:	0801da08 	.word	0x0801da08
- 8015fe8:	0801da19 	.word	0x0801da19
+ 8015fe4:	0801da00 	.word	0x0801da00
+ 8015fe8:	0801da11 	.word	0x0801da11
  8015fec:	40300000 	.word	0x40300000
  8015ff0:	3fe00000 	.word	0x3fe00000
  8015ff4:	fffffbff 	.word	0xfffffbff
@@ -53386,8 +53386,8 @@ void UserTask(void * argument)
  8016400:	f7ff fb1d 	bl	8015a3e <_svfprintf_r+0x426>
  8016404:	fffffbff 	.word	0xfffffbff
  8016408:	00007830 	.word	0x00007830
- 801640c:	0801da08 	.word	0x0801da08
- 8016410:	0801da19 	.word	0x0801da19
+ 801640c:	0801da00 	.word	0x0801da00
+ 8016410:	0801da11 	.word	0x0801da11
  8016414:	9b0f      	ldr	r3, [sp, #60]	; 0x3c
  8016416:	2b65      	cmp	r3, #101	; 0x65
  8016418:	dc00      	bgt.n	801641c <_svfprintf_r+0xe04>
@@ -53647,8 +53647,8 @@ void UserTask(void * argument)
  801662a:	3c10      	subs	r4, #16
  801662c:	e7ba      	b.n	80165a4 <_svfprintf_r+0xf8c>
  801662e:	46c0      	nop			; (mov r8, r8)
- 8016630:	0801da2a 	.word	0x0801da2a
- 8016634:	0801da3c 	.word	0x0801da3c
+ 8016630:	0801da22 	.word	0x0801da22
+ 8016634:	0801da34 	.word	0x0801da34
  8016638:	9b0d      	ldr	r3, [sp, #52]	; 0x34
  801663a:	002c      	movs	r4, r5
  801663c:	429d      	cmp	r5, r3
@@ -54077,7 +54077,7 @@ void UserTask(void * argument)
  80169a6:	3408      	adds	r4, #8
  80169a8:	0027      	movs	r7, r4
  80169aa:	e57a      	b.n	80164a2 <_svfprintf_r+0xe8a>
- 80169ac:	0801da3c 	.word	0x0801da3c
+ 80169ac:	0801da34 	.word	0x0801da34
  80169b0:	2710      	movs	r7, #16
  80169b2:	2d00      	cmp	r5, #0
  80169b4:	dde7      	ble.n	8016986 <_svfprintf_r+0x136e>
@@ -54245,8 +54245,8 @@ void UserTask(void * argument)
  8016b10:	9310      	str	r3, [sp, #64]	; 0x40
  8016b12:	9311      	str	r3, [sp, #68]	; 0x44
  8016b14:	f7fe feee 	bl	80158f4 <_svfprintf_r+0x2dc>
- 8016b18:	0801da3c 	.word	0x0801da3c
- 8016b1c:	0801da2c 	.word	0x0801da2c
+ 8016b18:	0801da34 	.word	0x0801da34
+ 8016b1c:	0801da24 	.word	0x0801da24
 
 08016b20 <sysconf>:
  8016b20:	2380      	movs	r3, #128	; 0x80
@@ -54802,10 +54802,10 @@ void UserTask(void * argument)
  8016f96:	46c0      	nop			; (mov r8, r8)
  8016f98:	7ff00000 	.word	0x7ff00000
  8016f9c:	0000270f 	.word	0x0000270f
- 8016fa0:	0801da4c 	.word	0x0801da4c
- 8016fa4:	0801da4f 	.word	0x0801da4f
- 8016fa8:	0801da2a 	.word	0x0801da2a
- 8016fac:	0801da2b 	.word	0x0801da2b
+ 8016fa0:	0801da44 	.word	0x0801da44
+ 8016fa4:	0801da47 	.word	0x0801da47
+ 8016fa8:	0801da22 	.word	0x0801da22
+ 8016fac:	0801da23 	.word	0x0801da23
  8016fb0:	3ff00000 	.word	0x3ff00000
  8016fb4:	fffffc01 	.word	0xfffffc01
  8016fb8:	3ff80000 	.word	0x3ff80000
@@ -54815,13 +54815,13 @@ void UserTask(void * argument)
  8016fc8:	3fc68a28 	.word	0x3fc68a28
  8016fcc:	509f79fb 	.word	0x509f79fb
  8016fd0:	3fd34413 	.word	0x3fd34413
- 8016fd4:	0801dbd0 	.word	0x0801dbd0
+ 8016fd4:	0801dbc8 	.word	0x0801dbc8
  8016fd8:	00000432 	.word	0x00000432
  8016fdc:	00000412 	.word	0x00000412
  8016fe0:	fe100000 	.word	0xfe100000
- 8016fe4:	0801da59 	.word	0x0801da59
- 8016fe8:	0801da6a 	.word	0x0801da6a
- 8016fec:	0801dba8 	.word	0x0801dba8
+ 8016fe4:	0801da51 	.word	0x0801da51
+ 8016fe8:	0801da62 	.word	0x0801da62
+ 8016fec:	0801dba0 	.word	0x0801dba0
  8016ff0:	9b02      	ldr	r3, [sp, #8]
  8016ff2:	2702      	movs	r7, #2
  8016ff4:	2b00      	cmp	r3, #0
@@ -55216,8 +55216,8 @@ void UserTask(void * argument)
  801734e:	601a      	str	r2, [r3, #0]
  8017350:	e4c6      	b.n	8016ce0 <_dtoa_r+0x68>
  8017352:	46c0      	nop			; (mov r8, r8)
- 8017354:	0801dbd0 	.word	0x0801dbd0
- 8017358:	0801dba8 	.word	0x0801dba8
+ 8017354:	0801dbc8 	.word	0x0801dbc8
+ 8017358:	0801dba0 	.word	0x0801dba0
  801735c:	3ff00000 	.word	0x3ff00000
  8017360:	40240000 	.word	0x40240000
  8017364:	401c0000 	.word	0x401c0000
@@ -55569,7 +55569,7 @@ void UserTask(void * argument)
  801764e:	e444      	b.n	8016eda <_dtoa_r+0x262>
  8017650:	40240000 	.word	0x40240000
  8017654:	00000433 	.word	0x00000433
- 8017658:	0801da59 	.word	0x0801da59
+ 8017658:	0801da51 	.word	0x0801da51
  801765c:	000002ea 	.word	0x000002ea
  8017660:	0039      	movs	r1, r7
  8017662:	693b      	ldr	r3, [r7, #16]
@@ -55790,8 +55790,8 @@ void UserTask(void * argument)
  8017836:	dd00      	ble.n	801783a <_dtoa_r+0xbc2>
  8017838:	e6be      	b.n	80175b8 <_dtoa_r+0x940>
  801783a:	e7b1      	b.n	80177a0 <_dtoa_r+0xb28>
- 801783c:	0801da50 	.word	0x0801da50
- 8017840:	0801da58 	.word	0x0801da58
+ 801783c:	0801da48 	.word	0x0801da48
+ 8017840:	0801da50 	.word	0x0801da50
 
 08017844 <__errno>:
  8017844:	4b01      	ldr	r3, [pc, #4]	; (801784c <__errno+0x8>)
@@ -55816,8 +55816,8 @@ void UserTask(void * argument)
  801786a:	4798      	blx	r3
  801786c:	e7f5      	b.n	801785a <__libc_fini_array+0xa>
  801786e:	46c0      	nop			; (mov r8, r8)
- 8017870:	0801dd10 	.word	0x0801dd10
- 8017874:	0801dd14 	.word	0x0801dd14
+ 8017870:	0801dd08 	.word	0x0801dd08
+ 8017874:	0801dd0c 	.word	0x0801dd0c
 
 08017878 <_malloc_trim_r>:
  8017878:	b5f7      	push	{r0, r1, r2, r4, r5, r6, r7, lr}
@@ -56537,9 +56537,9 @@ void UserTask(void * argument)
  8017e4e:	2b00      	cmp	r3, #0
  8017e50:	d1f3      	bne.n	8017e3a <__gethex+0x2e2>
  8017e52:	e7dd      	b.n	8017e10 <__gethex+0x2b8>
- 8017e54:	0801db34 	.word	0x0801db34
- 8017e58:	0801da59 	.word	0x0801da59
- 8017e5c:	0801dac9 	.word	0x0801dac9
+ 8017e54:	0801db2c 	.word	0x0801db2c
+ 8017e58:	0801da51 	.word	0x0801da51
+ 8017e5c:	0801dac1 	.word	0x0801dac1
  8017e60:	9b13      	ldr	r3, [sp, #76]	; 0x4c
  8017e62:	2b00      	cmp	r3, #0
  8017e64:	d1d4      	bne.n	8017e10 <__gethex+0x2b8>
@@ -56715,7 +56715,7 @@ void UserTask(void * argument)
  8017fc6:	dbe4      	blt.n	8017f92 <__gethex+0x43a>
  8017fc8:	e7b0      	b.n	8017f2c <__gethex+0x3d4>
  8017fca:	46c0      	nop			; (mov r8, r8)
- 8017fcc:	0801da59 	.word	0x0801da59
+ 8017fcc:	0801da51 	.word	0x0801da51
 
 08017fd0 <L_shift>:
  8017fd0:	2308      	movs	r3, #8
@@ -57117,8 +57117,8 @@ void UserTask(void * argument)
  80182c6:	0020      	movs	r0, r4
  80182c8:	bdfe      	pop	{r1, r2, r3, r4, r5, r6, r7, pc}
  80182ca:	46c0      	nop			; (mov r8, r8)
- 80182cc:	0801da59 	.word	0x0801da59
- 80182d0:	0801db48 	.word	0x0801db48
+ 80182cc:	0801da51 	.word	0x0801da51
+ 80182d0:	0801db40 	.word	0x0801db40
 
 080182d4 <__s2b>:
  80182d4:	b5f7      	push	{r0, r1, r2, r4, r5, r6, r7, lr}
@@ -57188,8 +57188,8 @@ void UserTask(void * argument)
  801835e:	3701      	adds	r7, #1
  8018360:	0001      	movs	r1, r0
  8018362:	e7ed      	b.n	8018340 <__s2b+0x6c>
- 8018364:	0801da59 	.word	0x0801da59
- 8018368:	0801db48 	.word	0x0801db48
+ 8018364:	0801da51 	.word	0x0801da51
+ 8018368:	0801db40 	.word	0x0801db40
 
 0801836c <__hi0bits>:
  801836c:	0003      	movs	r3, r0
@@ -57284,8 +57284,8 @@ void UserTask(void * argument)
  801841a:	6144      	str	r4, [r0, #20]
  801841c:	6103      	str	r3, [r0, #16]
  801841e:	bd10      	pop	{r4, pc}
- 8018420:	0801da59 	.word	0x0801da59
- 8018424:	0801db48 	.word	0x0801db48
+ 8018420:	0801da51 	.word	0x0801da51
+ 8018424:	0801db40 	.word	0x0801db40
 
 08018428 <__multiply>:
  8018428:	b5f0      	push	{r4, r5, r6, r7, lr}
@@ -57458,8 +57458,8 @@ void UserTask(void * argument)
  801857a:	3b01      	subs	r3, #1
  801857c:	9302      	str	r3, [sp, #8]
  801857e:	e79c      	b.n	80184ba <__multiply+0x92>
- 8018580:	0801da59 	.word	0x0801da59
- 8018584:	0801db48 	.word	0x0801db48
+ 8018580:	0801da51 	.word	0x0801da51
+ 8018584:	0801db40 	.word	0x0801db40
 
 08018588 <__pow5mult>:
  8018588:	b5f7      	push	{r0, r1, r2, r4, r5, r6, r7, lr}
@@ -57519,7 +57519,7 @@ void UserTask(void * argument)
  80185fe:	0030      	movs	r0, r6
  8018600:	bdfe      	pop	{r1, r2, r3, r4, r5, r6, r7, pc}
  8018602:	46c0      	nop			; (mov r8, r8)
- 8018604:	0801dc98 	.word	0x0801dc98
+ 8018604:	0801dc90 	.word	0x0801dc90
  8018608:	00000271 	.word	0x00000271
 
 0801860c <__lshift>:
@@ -57628,8 +57628,8 @@ void UserTask(void * argument)
  80186de:	429a      	cmp	r2, r3
  80186e0:	d8fb      	bhi.n	80186da <__lshift+0xce>
  80186e2:	e7f0      	b.n	80186c6 <__lshift+0xba>
- 80186e4:	0801da59 	.word	0x0801da59
- 80186e8:	0801db48 	.word	0x0801db48
+ 80186e4:	0801da51 	.word	0x0801da51
+ 80186e8:	0801db40 	.word	0x0801db40
 
 080186ec <__mcmp>:
  80186ec:	6902      	ldr	r2, [r0, #16]
@@ -57804,9 +57804,9 @@ void UserTask(void * argument)
  8018842:	3801      	subs	r0, #1
  8018844:	e7e9      	b.n	801881a <__mdiff+0xf6>
  8018846:	46c0      	nop			; (mov r8, r8)
- 8018848:	0801da59 	.word	0x0801da59
+ 8018848:	0801da51 	.word	0x0801da51
  801884c:	00000232 	.word	0x00000232
- 8018850:	0801db48 	.word	0x0801db48
+ 8018850:	0801db40 	.word	0x0801db40
 
 08018854 <__ulp>:
  8018854:	4b0f      	ldr	r3, [pc, #60]	; (8018894 <__ulp+0x40>)
@@ -58008,9 +58008,9 @@ void UserTask(void * argument)
  80189e6:	601c      	str	r4, [r3, #0]
  80189e8:	e7df      	b.n	80189aa <__d2b+0x6e>
  80189ea:	46c0      	nop			; (mov r8, r8)
- 80189ec:	0801da59 	.word	0x0801da59
+ 80189ec:	0801da51 	.word	0x0801da51
  80189f0:	0000030a 	.word	0x0000030a
- 80189f4:	0801db48 	.word	0x0801db48
+ 80189f4:	0801db40 	.word	0x0801db40
  80189f8:	fffffbcd 	.word	0xfffffbcd
  80189fc:	fffffbce 	.word	0xfffffbce
  8018a00:	3fffffff 	.word	0x3fffffff
@@ -58379,7 +58379,7 @@ void UserTask(void * argument)
  8018ce0:	2000      	movs	r0, #0
  8018ce2:	e7dd      	b.n	8018ca0 <__register_exitproc+0x38>
  8018ce4:	20000910 	.word	0x20000910
- 8018ce8:	0801d9a4 	.word	0x0801d9a4
+ 8018ce8:	0801d998 	.word	0x0801d998
 
 08018cec <__assert_func>:
  8018cec:	b530      	push	{r4, r5, lr}
@@ -58403,9 +58403,9 @@ void UserTask(void * argument)
  8018d10:	f000 f836 	bl	8018d80 <fiprintf>
  8018d14:	f000 fe1e 	bl	8019954 <abort>
  8018d18:	200000d0 	.word	0x200000d0
- 8018d1c:	0801dca4 	.word	0x0801dca4
- 8018d20:	0801dcdf 	.word	0x0801dcdf
- 8018d24:	0801dcb1 	.word	0x0801dcb1
+ 8018d1c:	0801dc9c 	.word	0x0801dc9c
+ 8018d20:	0801dcd7 	.word	0x0801dcd7
+ 8018d24:	0801dca9 	.word	0x0801dca9
 
 08018d28 <_calloc_r>:
  8018d28:	b510      	push	{r4, lr}
@@ -58837,7 +58837,7 @@ void UserTask(void * argument)
  80190f0:	3201      	adds	r2, #1
  80190f2:	e7f1      	b.n	80190d8 <_vfiprintf_r+0x2d0>
  80190f4:	ffffdfff 	.word	0xffffdfff
- 80190f8:	0801da08 	.word	0x0801da08
+ 80190f8:	0801da00 	.word	0x0801da00
  80190fc:	fffffbff 	.word	0xfffffbff
  8019100:	cd08      	ldmia	r5!, {r3}
  8019102:	9305      	str	r3, [sp, #20]
@@ -59334,11 +59334,11 @@ void UserTask(void * argument)
  80194ea:	9104      	str	r1, [sp, #16]
  80194ec:	2301      	movs	r3, #1
  80194ee:	e7a1      	b.n	8019434 <_vfiprintf_r+0x62c>
- 80194f0:	0801dce0 	.word	0x0801dce0
- 80194f4:	0801dcf0 	.word	0x0801dcf0
+ 80194f0:	0801dcd8 	.word	0x0801dcd8
+ 80194f4:	0801dce8 	.word	0x0801dce8
  80194f8:	fffffbff 	.word	0xfffffbff
  80194fc:	00007830 	.word	0x00007830
- 8019500:	0801da08 	.word	0x0801da08
+ 8019500:	0801da00 	.word	0x0801da00
  8019504:	1d2b      	adds	r3, r5, #4
  8019506:	0022      	movs	r2, r4
  8019508:	9304      	str	r3, [sp, #16]
@@ -59707,8 +59707,8 @@ void UserTask(void * argument)
  80197f6:	1b5b      	subs	r3, r3, r5
  80197f8:	9305      	str	r3, [sp, #20]
  80197fa:	e4c1      	b.n	8019180 <_vfiprintf_r+0x378>
- 80197fc:	0801da19 	.word	0x0801da19
- 8019800:	0801dce0 	.word	0x0801dce0
+ 80197fc:	0801da11 	.word	0x0801da11
+ 8019800:	0801dcd8 	.word	0x0801dcd8
 
 08019804 <__sbprintf>:
  8019804:	b5f0      	push	{r4, r5, r6, r7, lr}
