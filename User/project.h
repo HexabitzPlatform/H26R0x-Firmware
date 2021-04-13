@@ -5,23 +5,16 @@
     File Name     : project.h
     Description   : Hexabitz project header file. This file must be modified for each project.
 */
-	
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef PROJECT_H
 #define PROJECT_H
 
-
 /* Includes ------------------------------------------------------------------*/
 
-
 /* Include a predefined topology here */
-//#include "topology_1.h"
-
-
-
+#include "topology_1.h"
 /* Emulated EEPROM Virtual addresses for user parameters */
-
-
 
 #endif /* PROJECT_H */
 

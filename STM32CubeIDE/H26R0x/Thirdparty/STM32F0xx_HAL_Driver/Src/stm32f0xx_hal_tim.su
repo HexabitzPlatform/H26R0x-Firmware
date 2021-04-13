@@ -1,7 +1,14 @@
-stm32f0xx_hal_tim.c:4550:13:TIM_OC1_SetConfig	16	static
+stm32f0xx_hal_tim.c:4550:13:TIM_OC1_SetConfig	12	static
 stm32f0xx_hal_tim.c:4702:13:TIM_OC3_SetConfig	16	static
 stm32f0xx_hal_tim.c:4778:13:TIM_OC4_SetConfig	12	static
-stm32f0xx_hal_tim.c:4830:6:TIM_SlaveTimer_SetConfig	12	static
+stm32f0xx_hal_tim.c:5021:13:TIM_TI1_ConfigInputStage	12	static
+stm32f0xx_hal_tim.c:5064:13:TIM_TI2_SetConfig	16	static
+stm32f0xx_hal_tim.c:5104:13:TIM_TI2_ConfigInputStage	12	static
+stm32f0xx_hal_tim.c:5147:13:TIM_TI3_SetConfig	16	static
+stm32f0xx_hal_tim.c:5195:13:TIM_TI4_SetConfig	16	static
+stm32f0xx_hal_tim.c:5238:13:TIM_ITRx_SetConfig	0	static
+stm32f0xx_hal_tim.c:5268:13:TIM_ETR_SetConfig	12	static
+stm32f0xx_hal_tim.c:4830:6:TIM_SlaveTimer_SetConfig	16	static
 stm32f0xx_hal_tim.c:273:13:HAL_TIM_Base_MspInit	0	static
 stm32f0xx_hal_tim.c:285:13:HAL_TIM_Base_MspDeInit	0	static
 stm32f0xx_hal_tim.c:246:19:HAL_TIM_Base_DeInit	8	static
@@ -9,7 +16,7 @@ stm32f0xx_hal_tim.c:298:19:HAL_TIM_Base_Start	8	static
 stm32f0xx_hal_tim.c:321:19:HAL_TIM_Base_Stop	0	static
 stm32f0xx_hal_tim.c:344:19:HAL_TIM_Base_Start_IT	0	static
 stm32f0xx_hal_tim.c:364:19:HAL_TIM_Base_Stop_IT	0	static
-stm32f0xx_hal_tim.c:385:19:HAL_TIM_Base_Start_DMA	16	static
+stm32f0xx_hal_tim.c:385:19:HAL_TIM_Base_Start_DMA	8	static
 stm32f0xx_hal_tim.c:429:19:HAL_TIM_Base_Stop_DMA	0	static
 stm32f0xx_hal_tim.c:544:13:HAL_TIM_OC_MspInit	0	static
 stm32f0xx_hal_tim.c:556:13:HAL_TIM_OC_MspDeInit	0	static
@@ -32,7 +39,7 @@ stm32f0xx_hal_tim.c:3522:19:HAL_TIM_DMABurst_ReadStart	16	static
 stm32f0xx_hal_tim.c:3654:19:HAL_TIM_DMABurst_ReadStop	16	static
 stm32f0xx_hal_tim.c:3726:19:HAL_TIM_GenerateEvent	0	static
 stm32f0xx_hal_tim.c:3763:19:HAL_TIM_ConfigOCrefClear	16	static
-stm32f0xx_hal_tim.c:3888:19:HAL_TIM_ConfigClockSource	16	static
+stm32f0xx_hal_tim.c:3888:19:HAL_TIM_ConfigClockSource	8	static
 stm32f0xx_hal_tim.c:4043:19:HAL_TIM_ConfigTI1Input	0	static
 stm32f0xx_hal_tim.c:4075:19:HAL_TIM_SlaveConfigSynchronization	24	static
 stm32f0xx_hal_tim.c:4110:19:HAL_TIM_SlaveConfigSynchronization_IT	24	static
@@ -66,8 +73,8 @@ stm32f0xx_hal_tim.c:4624:6:TIM_OC2_SetConfig	16	static
 stm32f0xx_hal_tim.c:2892:19:HAL_TIM_OC_ConfigChannel	8	static
 stm32f0xx_hal_tim.c:3060:19:HAL_TIM_PWM_ConfigChannel	16	static
 stm32f0xx_hal_tim.c:4974:6:TIM_TI1_SetConfig	20	static
-stm32f0xx_hal_tim.c:2964:19:HAL_TIM_IC_ConfigChannel	24	static
-stm32f0xx_hal_tim.c:3163:19:HAL_TIM_OnePulse_ConfigChannel	56	static
+stm32f0xx_hal_tim.c:2964:19:HAL_TIM_IC_ConfigChannel	16	static
+stm32f0xx_hal_tim.c:3163:19:HAL_TIM_OnePulse_ConfigChannel	48	static
 stm32f0xx_hal_tim.c:5298:6:TIM_CCxChannelCmd	8	static
 stm32f0xx_hal_tim.c:574:19:HAL_TIM_OC_Start	8	static
 stm32f0xx_hal_tim.c:606:19:HAL_TIM_OC_Stop	8	static

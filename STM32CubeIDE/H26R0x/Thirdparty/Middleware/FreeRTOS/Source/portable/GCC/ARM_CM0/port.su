@@ -1,5 +1,6 @@
 port.c:152:13:prvTaskExitError	0	static,ignoring_inline_asm
 port.c:173:6:vPortStartFirstTask	0	static,ignoring_inline_asm
+port.c:361:6:prvSetupTimerInterrupt	8	static
 port.c:134:14:pxPortInitialiseStack	8	static
 port.c:166:6:SVC_Handler	0	static
 port.c:200:12:xPortStartScheduler	8	static

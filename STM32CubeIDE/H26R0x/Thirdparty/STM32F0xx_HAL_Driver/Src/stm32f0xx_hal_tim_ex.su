@@ -29,7 +29,7 @@ stm32f0xx_hal_tim_ex.c:1455:19:HAL_TIMEx_ConfigCommutationEvent	12	static
 stm32f0xx_hal_tim_ex.c:1504:19:HAL_TIMEx_ConfigCommutationEvent_IT	12	static
 stm32f0xx_hal_tim_ex.c:1557:19:HAL_TIMEx_ConfigCommutationEvent_DMA	12	static
 stm32f0xx_hal_tim_ex.c:1601:19:HAL_TIMEx_MasterConfigSynchronization	20	static
-stm32f0xx_hal_tim_ex.c:1637:19:HAL_TIMEx_ConfigBreakDeadTime	20	static
+stm32f0xx_hal_tim_ex.c:1637:19:HAL_TIMEx_ConfigBreakDeadTime	16	static
 stm32f0xx_hal_tim_ex.c:1684:19:HAL_TIMEx_RemapConfig	0	static
 stm32f0xx_hal_tim_ex.c:1727:13:HAL_TIMEx_CommutationCallback	0	static
 stm32f0xx_hal_tim_ex.c:1751:6:TIMEx_DMACommutationCplt	8	static

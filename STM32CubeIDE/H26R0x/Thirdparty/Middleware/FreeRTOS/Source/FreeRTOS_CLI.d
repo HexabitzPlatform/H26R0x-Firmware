@@ -42,7 +42,7 @@ Thirdparty/Middleware/FreeRTOS/Source/FreeRTOS_CLI.o: \
  ../../Thirdparty/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_tim_ex.h \
  ../../Thirdparty/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h \
  ../../Thirdparty/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart_ex.h \
- ../../User/project.h \
+ ../../User/project.h ../../User/topology_1.h \
  ../../Thirdparty/Middleware/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h \
  ../../Thirdparty/Middleware/FreeRTOS/Source/include/timers.h \
  ../../Thirdparty/Middleware/FreeRTOS/Source/include/task.h \
@@ -143,6 +143,8 @@ Thirdparty/Middleware/FreeRTOS/Source/FreeRTOS_CLI.o: \
 ../../Thirdparty/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart_ex.h:
 
 ../../User/project.h:
+
+../../User/topology_1.h:
 
 ../../Thirdparty/Middleware/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:
 
