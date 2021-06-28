@@ -1,10 +1,10 @@
 /*
-    BitzOS (BOS)V0.2.4 - Copyright (C) 2017-2021 Hexabitz
+    BitzOS (BOS)V0.2.5 - Copyright (C) 2017-2021 Hexabitz
     All rights reserved
 
     File Name     : H26R0.c
     Description   : Source code for module H26R0.
-										Load cell (strain gauge) Whatstone bridge sensor (HX711)
+					Load cell (strain gauge) Whatstone bridge sensor (HX711)
 		
 		Required MCU resources : 
 		
@@ -284,7 +284,7 @@ void SystemClock_Config(void)
 
 /* --- H26R0 module initialization. 
 */
-void Module_Init(void)
+void Module_Peripheral_Init(void)
 {
 	/* Array ports */
 	MX_USART2_UART_Init();
@@ -548,6 +548,9 @@ void RegisterModuleCLICommands(void)
 	
 }
 
+void ExecuteMonitor(void){
+
+}
 /*-----------------------------------------------------------*/
 
 /* --- Get the port for a given UART. 

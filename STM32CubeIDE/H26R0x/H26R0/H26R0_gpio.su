@@ -1,5 +1,0 @@
-H26R0_gpio.c:64:6:IND_LED_Init	32	static
-H26R0_gpio.c:51:6:GPIO_Init	32	static
-H26R0_gpio.c:76:6:HX711_GPIO_Init	40	static
-H26R0_gpio.c:148:12:GetPortGPIOs	16	static
-H26R0_gpio.c:94:9:IsFactoryReset	88	static

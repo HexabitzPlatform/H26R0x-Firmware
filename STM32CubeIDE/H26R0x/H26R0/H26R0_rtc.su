@@ -1,4 +1,0 @@
-H26R0_rtc.c:111:12:RTC_CalendarConfig	80	static
-H26R0_rtc.c:59:12:RTC_Init	8	static
-H26R0_rtc.c:166:12:BOS_CalendarConfig	48	static
-H26R0_rtc.c:221:6:GetTimeDate	48	static
