@@ -14,7 +14,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern uint8_t UARTRxBuf[NumOfPorts][MSG_RX_BUF_SIZE];
-//extern uint8_t UARTTxBuf[3][MSG_TX_BUF_SIZE];
+extern uint8_t UARTRxBufIndex[NumOfPorts];
 
 /* External function prototypes ----------------------------------------------*/
 

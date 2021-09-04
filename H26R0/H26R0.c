@@ -471,31 +471,37 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			break;
 		
 		case (CODE_H26R0_SAMPLE_GRAM):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SampleGram(cMessage[port-1][shift]);
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SampleGram(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SampleGram(cMessage[port-1][shift]);
+				H26R0_Weight2 =SampleGram(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Gram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 			
 		case (CODE_H26R0_SAMPLE_KGRAM):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SampleKGram(cMessage[port-1][shift]);
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SampleKGram(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SampleKGram(cMessage[port-1][shift]);	
+				H26R0_Weight2 =SampleKGram(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,KGram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 			
 		case (CODE_H26R0_SAMPLE_OUNCE):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SampleOunce(cMessage[port-1][shift]);
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SampleOunce(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SampleOunce(cMessage[port-1][shift]);	
+				H26R0_Weight2 =SampleOunce(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Ounce,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
+
 			break;
 			
 		case (CODE_H26R0_SAMPLE_POUND):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SamplePound(cMessage[port-1][shift]);
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SamplePound(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SamplePound(cMessage[port-1][shift]);
+				H26R0_Weight2 =SamplePound(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Pound,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
+
 			break;
 			
 		case (CODE_H26R0_ZEROCAL):
