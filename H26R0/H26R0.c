@@ -470,7 +470,7 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			xTimerStop( xTimer, portMAX_DELAY );
 			break;
 		
-		case (CODE_H26R0_SAMPLE_GRAM):
+		case (CODE_H26R0_SAMPLE_PORT_GRAM):
 			if(cMessage[port - 1][shift] == 1)
 				H26R0_Weight1 =SampleGram(cMessage[port - 1][shift]);
 			else
@@ -478,7 +478,7 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Gram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 			
-		case (CODE_H26R0_SAMPLE_KGRAM):
+		case (CODE_H26R0_SAMPLE_PORT_KGRAM):
 			if(cMessage[port - 1][shift] == 1)
 				H26R0_Weight1 =SampleKGram(cMessage[port - 1][shift]);
 			else
@@ -486,7 +486,7 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,KGram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 			
-		case (CODE_H26R0_SAMPLE_OUNCE):
+		case (CODE_H26R0_SAMPLE_PORT_OUNCE):
 			if(cMessage[port - 1][shift] == 1)
 				H26R0_Weight1 =SampleOunce(cMessage[port - 1][shift]);
 			else
@@ -495,7 +495,7 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 
 			break;
 			
-		case (CODE_H26R0_SAMPLE_POUND):
+		case (CODE_H26R0_SAMPLE_PORT_POUND):
 			if(cMessage[port - 1][shift] == 1)
 				H26R0_Weight1 =SamplePound(cMessage[port - 1][shift]);
 			else
