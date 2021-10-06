@@ -91,6 +91,7 @@ uint16_t EE_full_scale=0;
 uint16_t word_LSB=0, word_MSB=0;
 uint32_t temp32=0;
 
+float weightSample __attribute__((section(".mySection")));
 
 /* Private function prototypes -----------------------------------------------*/	
 float readHX711(void);
@@ -101,7 +102,6 @@ void TimerTask(void * argument);
 static void CheckForEnterKey(void);
 static void HandleTimeout(TimerHandle_t xTimer);
 int StreamRawToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
-
 /* Create CLI commands --------------------------------------------------------*/
 static portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
@@ -317,6 +317,11 @@ void Module_Peripheral_Init(void)
 
 	
 }
+
+void initialValue(void)
+{
+	weightSample=0;
+}
 /*-----------------------------------------------------------*/
 /* --- Save array topology and Command Snippets in Flash RO --- 
 */
@@ -509,14 +514,15 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			break;
 			
 		case (CODE_H26R0_STREAM_RAW):
-			period = ( (uint32_t) cMessage[port-1][1+shift] << 24 ) + ( (uint32_t) cMessage[port-1][2+shift] << 16 ) + ( (uint32_t) cMessage[port-1][3+shift] << 8 ) + cMessage[port-1][4+shift];
-			timeout = ( (uint32_t) cMessage[port-1][5+shift] << 24 ) + ( (uint32_t) cMessage[port-1][6+shift] << 16 ) + ( (uint32_t) cMessage[port-1][7+shift] << 8 ) + cMessage[port-1][8+shift];
-			StreamRawToPort(cMessage[port-1][shift], cMessage[port-1][9+shift], cMessage[port-1][10+shift], period, timeout);
-			H26R0_Weight2=Average(cMessage[port-1][shift],1);	
+			period =((uint32_t )cMessage[port - 1][6 + shift] << 24) + ((uint32_t )cMessage[port - 1][5 + shift] << 16) + ((uint32_t )cMessage[port - 1][4 + shift] << 8) + cMessage[port - 1][3 + shift];
+			timeout = ((uint32_t) cMessage[port - 1][10 + shift] << 24) + ((uint32_t) cMessage[port - 1][9 + shift] << 16) + ((uint32_t) cMessage[port - 1][8 + shift] << 8) + cMessage[port - 1][7 + shift];
+			H26R0_Weight2=Average(cMessage[port-1][shift],1);
+			StreamRawToPort(cMessage[port - 1][shift],cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift], period, timeout);
 			break;
 			
 		case (CODE_H26R0_SAMPLE_RAW):
 			H26R0_Weight2=Average(cMessage[port-1][shift],1);	
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Gram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 		
 		case (CODE_H26R0_STREAM_FORMAT):
@@ -554,9 +560,7 @@ void RegisterModuleCLICommands(void)
 	
 }
 
-void ExecuteMonitor(void){
 
-}
 /*-----------------------------------------------------------*/
 
 /* --- Get the port for a given UART. 
@@ -658,6 +662,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		default:
 			Raw_Msg=message; break;
 	}
+	weightSample=Raw_Msg;
 
   /* Get CLI output buffer */
   pcOutputString = FreeRTOS_CLIGetOutputBuffer();
