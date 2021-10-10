@@ -1,10 +1,10 @@
 /*
-    BitzOS (BOS)V0.2.4 - Copyright (C) 2017-2021 Hexabitz
+    BitzOS (BOS)V0.2.5 - Copyright (C) 2017-2021 Hexabitz
     All rights reserved
 
     File Name     : H26R0.c
     Description   : Source code for module H26R0.
-										Load cell (strain gauge) Whatstone bridge sensor (HX711)
+					Load cell (strain gauge) Whatstone bridge sensor (HX711)
 		
 		Required MCU resources : 
 		
@@ -91,6 +91,7 @@ uint16_t EE_full_scale=0;
 uint16_t word_LSB=0, word_MSB=0;
 uint32_t temp32=0;
 
+float weightSample __attribute__((section(".mySection")));
 
 /* Private function prototypes -----------------------------------------------*/	
 float readHX711(void);
@@ -101,7 +102,6 @@ void TimerTask(void * argument);
 static void CheckForEnterKey(void);
 static void HandleTimeout(TimerHandle_t xTimer);
 int StreamRawToPort(uint8_t Ch, uint8_t Port, uint8_t Module, uint32_t Period, uint32_t Timeout);
-
 /* Create CLI commands --------------------------------------------------------*/
 static portBASE_TYPE demoCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
 static portBASE_TYPE sampleCommand( int8_t *pcWriteBuffer, size_t xWriteBufferLen, const int8_t *pcCommandString );
@@ -239,84 +239,88 @@ const CLI_Command_Definition_t dataformatCommandDefinition =
   */
 void SystemClock_Config(void)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct;
-  RCC_ClkInitTypeDef RCC_ClkInitStruct;
-  RCC_PeriphCLKInitTypeDef PeriphClkInit;
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
-  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
-  HAL_RCC_OscConfig(&RCC_OscInitStruct);
+	RCC_OscInitStruct.HSICalibrationValue =16;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+	RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
+	HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
-  RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1);
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1);
+	RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1);
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+	HAL_RCC_ClockConfig(&RCC_ClkInitStruct,FLASH_LATENCY_1);
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_USART3;
-  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
-  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
-  HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
+	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1 | RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_USART3;
+	PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
+	PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+	PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
+	HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
 	
 	__HAL_RCC_PWR_CLK_ENABLE();
-  HAL_PWR_EnableBkUpAccess();
+	HAL_PWR_EnableBkUpAccess();
 	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV32;
+	PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV32;
 	HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
-
-  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
-
-  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 	
+	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
+
+	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
 	__SYSCFG_CLK_ENABLE();
-
-  /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 	
+	/* SysTick_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(SysTick_IRQn,0,0);
+
 }
 
 /* --- H26R0 module initialization. 
 */
-void Module_Init(void)
+void Module_Peripheral_Init(void)
 {
 	/* Array ports */
-  MX_USART2_UART_Init();
-  MX_USART3_UART_Init();
+	MX_USART2_UART_Init();
+	MX_USART3_UART_Init();
 	MX_USART4_UART_Init();
-  MX_USART5_UART_Init();
-  MX_USART6_UART_Init();
+	MX_USART5_UART_Init();
+	MX_USART6_UART_Init();
 	
 	/* HX711 */
-	HX711_GPIO_Init();     // GPIO init
+	HX711_GPIO_Init();// GPIO init
 	
 	/* Creat load cell task */
-	xTaskCreate(LoadcellTask, (const char*) "LoadcellTask", (2*configMINIMAL_STACK_SIZE), NULL, osPriorityNormal-osPriorityIdle, &LoadcellHandle);	
+	xTaskCreate(LoadcellTask,(const char* ) "LoadcellTask",(2*configMINIMAL_STACK_SIZE),NULL,osPriorityNormal - osPriorityIdle,&LoadcellHandle);
 	
 	/* load saved var*/
-	EE_ReadVariable(_EE_cell_full_scale, &full_scale);
-	EE_ReadVariable(_EE_cell_drift_LSB, &word_LSB);
-	EE_ReadVariable(_EE_cell_drift_MSB, &word_MSB);
-	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
-	cell_drift=*(float*)&temp32;
-	EE_ReadVariable(_EE_cell_output_LSB, &word_LSB);
-	EE_ReadVariable(_EE_cell_output_MSB, &word_MSB);
-	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
-	cell_output=*(float*)&temp32;
-	EE_ReadVariable(_EE_zero_drift_LSB, &word_LSB);
-	EE_ReadVariable(_EE_zero_drift_MSB, &word_MSB);
-	temp32=(uint32_t)word_LSB+((uint32_t)word_MSB<<16);
-	Zero_Drift=*(float*)&temp32;
-	calibration_factor=cell_output*AVDD/1000.0f;		// mV
+	EE_ReadVariable(_EE_cell_full_scale,&full_scale);
+	EE_ReadVariable(_EE_cell_drift_LSB,&word_LSB);
+	EE_ReadVariable(_EE_cell_drift_MSB,&word_MSB);
+	temp32 =(uint32_t) word_LSB + ((uint32_t) word_MSB << 16);
+	cell_drift =*(float*) &temp32;
+	EE_ReadVariable(_EE_cell_output_LSB,&word_LSB);
+	EE_ReadVariable(_EE_cell_output_MSB,&word_MSB);
+	temp32 =(uint32_t) word_LSB + ((uint32_t) word_MSB << 16);
+	cell_output =*(float*) &temp32;
+	EE_ReadVariable(_EE_zero_drift_LSB,&word_LSB);
+	EE_ReadVariable(_EE_zero_drift_MSB,&word_MSB);
+	temp32 =(uint32_t) word_LSB + ((uint32_t) word_MSB << 16);
+	Zero_Drift =*(float*) &temp32;
+	calibration_factor =cell_output * AVDD / 1000.0f;// mV
 
 	
+}
+
+void initialValue(void)
+{
+	weightSample=0;
 }
 /*-----------------------------------------------------------*/
 /* --- Save array topology and Command Snippets in Flash RO --- 
@@ -442,27 +446,27 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			break;
 		
 		case (CODE_H26R0_STREAM_PORT_GRAM):
-			period = ( (uint32_t) cMessage[port-1][1+shift] << 24 ) + ( (uint32_t) cMessage[port-1][2+shift] << 16 ) + ( (uint32_t) cMessage[port-1][3+shift] << 8 ) + cMessage[port-1][4+shift];
-			timeout = ( (uint32_t) cMessage[port-1][5+shift] << 24 ) + ( (uint32_t) cMessage[port-1][6+shift] << 16 ) + ( (uint32_t) cMessage[port-1][7+shift] << 8 ) + cMessage[port-1][8+shift];
-			StreamGramToPort(cMessage[port-1][shift], cMessage[port-1][9+shift], cMessage[port-1][10+shift], period, timeout);
+		period = ((uint32_t) cMessage[port - 1][6 + shift] << 24) + ((uint32_t) cMessage[port - 1][5 + shift] << 16) + ((uint32_t) cMessage[port - 1][4 + shift] << 8) + cMessage[port - 1][3 + shift];
+		timeout = ((uint32_t) cMessage[port - 1][10 + shift] << 24) + ((uint32_t) cMessage[port - 1][9 + shift] << 16) + ((uint32_t) cMessage[port - 1][8 + shift] << 8) + cMessage[port - 1][7 + shift];
+		StreamGramToPort(cMessage[port - 1][shift],cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],period,timeout);
 			break;
 		
 		case (CODE_H26R0_STREAM_PORT_KGRAM):
-			period = ( (uint32_t) cMessage[port-1][1+shift] << 24 ) + ( (uint32_t) cMessage[port-1][2+shift] << 16 ) + ( (uint32_t) cMessage[port-1][3+shift] << 8 ) + cMessage[port-1][4+shift];
-			timeout = ( (uint32_t) cMessage[port-1][5+shift] << 24 ) + ( (uint32_t) cMessage[port-1][6+shift] << 16 ) + ( (uint32_t) cMessage[port-1][7+shift] << 8 ) + cMessage[port-1][8+shift];
-			StreamKGramToPort(cMessage[port-1][shift], cMessage[port-1][9+shift], cMessage[port-1][10+shift], period, timeout);
+		period = ((uint32_t) cMessage[port - 1][6 + shift] << 24) + ((uint32_t) cMessage[port - 1][5 + shift] << 16) + ((uint32_t) cMessage[port - 1][4 + shift] << 8) + cMessage[port - 1][3 + shift];
+		timeout = ((uint32_t) cMessage[port - 1][10 + shift] << 24) + ((uint32_t) cMessage[port - 1][9 + shift] << 16) + ((uint32_t) cMessage[port - 1][8 + shift] << 8) + cMessage[port - 1][7 + shift];
+		StreamKGramToPort(cMessage[port - 1][shift],cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],period,timeout);
 			break;
 		
-    case (CODE_H26R0_STREAM_PORT_OUNCE):
-			period = ( (uint32_t) cMessage[port-1][1+shift] << 24 ) + ( (uint32_t) cMessage[port-1][2+shift] << 16 ) + ( (uint32_t) cMessage[port-1][3+shift] << 8 ) + cMessage[port-1][4+shift];
-			timeout = ( (uint32_t) cMessage[port-1][5+shift] << 24 ) + ( (uint32_t) cMessage[port-1][6+shift] << 16 ) + ( (uint32_t) cMessage[port-1][7+shift] << 8 ) + cMessage[port-1][8+shift];
-			StreamOunceToPort(cMessage[port-1][shift], cMessage[port-1][9+shift], cMessage[port-1][10+shift], period, timeout);
+		case (CODE_H26R0_STREAM_PORT_OUNCE):
+		period = ((uint32_t) cMessage[port - 1][6 + shift] << 24) + ((uint32_t) cMessage[port - 1][5 + shift] << 16) + ((uint32_t) cMessage[port - 1][4 + shift] << 8) + cMessage[port - 1][3 + shift];
+		timeout = ((uint32_t) cMessage[port - 1][10 + shift] << 24) + ((uint32_t) cMessage[port - 1][9 + shift] << 16) + ((uint32_t) cMessage[port - 1][8 + shift] << 8) + cMessage[port - 1][7 + shift];
+		StreamOunceToPort(cMessage[port - 1][shift],cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],period,timeout);
 			break;
 		
 		case (CODE_H26R0_STREAM_PORT_POUND):
-			period = ( (uint32_t) cMessage[port-1][1+shift] << 24 ) + ( (uint32_t) cMessage[port-1][2+shift] << 16 ) + ( (uint32_t) cMessage[port-1][3+shift] << 8 ) + cMessage[port-1][4+shift];
-			timeout = ( (uint32_t) cMessage[port-1][5+shift] << 24 ) + ( (uint32_t) cMessage[port-1][6+shift] << 16 ) + ( (uint32_t) cMessage[port-1][7+shift] << 8 ) + cMessage[port-1][8+shift];
-			StreamPoundToPort(cMessage[port-1][shift], cMessage[port-1][9+shift], cMessage[port-1][10+shift], period, timeout);
+		period = ((uint32_t) cMessage[port - 1][6 + shift] << 24) + ((uint32_t) cMessage[port - 1][5 + shift] << 16) + ((uint32_t) cMessage[port - 1][4 + shift] << 8) + cMessage[port - 1][3 + shift];
+		timeout = ((uint32_t) cMessage[port - 1][10 + shift] << 24) + ((uint32_t) cMessage[port - 1][9 + shift] << 16) + ((uint32_t) cMessage[port - 1][8 + shift] << 8) + cMessage[port - 1][7 + shift];
+		StreamPoundToPort(cMessage[port - 1][shift],cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],period,timeout);
 			break;
 		
 		case (CODE_H26R0_STOP):
@@ -471,32 +475,38 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			xTimerStop( xTimer, portMAX_DELAY );
 			break;
 		
-		case (CODE_H26R0_SAMPLE_GRAM):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SampleGram(cMessage[port-1][shift]);
+		case (CODE_H26R0_SAMPLE_PORT_GRAM):
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SampleGram(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SampleGram(cMessage[port-1][shift]);
+				H26R0_Weight2 =SampleGram(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Gram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 			
-		case (CODE_H26R0_SAMPLE_KGRAM):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SampleKGram(cMessage[port-1][shift]);
+		case (CODE_H26R0_SAMPLE_PORT_KGRAM):
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SampleKGram(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SampleKGram(cMessage[port-1][shift]);	
+				H26R0_Weight2 =SampleKGram(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,KGram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 			
-		case (CODE_H26R0_SAMPLE_OUNCE):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SampleOunce(cMessage[port-1][shift]);
+		case (CODE_H26R0_SAMPLE_PORT_OUNCE):
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SampleOunce(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SampleOunce(cMessage[port-1][shift]);	
+				H26R0_Weight2 =SampleOunce(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Ounce,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
+
 			break;
 			
-		case (CODE_H26R0_SAMPLE_POUND):
-			if (cMessage[port-1][shift] == 1)
-				H26R0_Weight1=SamplePound(cMessage[port-1][shift]);
+		case (CODE_H26R0_SAMPLE_PORT_POUND):
+			if(cMessage[port - 1][shift] == 1)
+				H26R0_Weight1 =SamplePound(cMessage[port - 1][shift]);
 			else
-				H26R0_Weight2=SamplePound(cMessage[port-1][shift]);
+				H26R0_Weight2 =SamplePound(cMessage[port - 1][shift]);
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Pound,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
+
 			break;
 			
 		case (CODE_H26R0_ZEROCAL):
@@ -504,14 +514,15 @@ Module_Status Module_MessagingTask(uint16_t code, uint8_t port, uint8_t src, uin
 			break;
 			
 		case (CODE_H26R0_STREAM_RAW):
-			period = ( (uint32_t) cMessage[port-1][1+shift] << 24 ) + ( (uint32_t) cMessage[port-1][2+shift] << 16 ) + ( (uint32_t) cMessage[port-1][3+shift] << 8 ) + cMessage[port-1][4+shift];
-			timeout = ( (uint32_t) cMessage[port-1][5+shift] << 24 ) + ( (uint32_t) cMessage[port-1][6+shift] << 16 ) + ( (uint32_t) cMessage[port-1][7+shift] << 8 ) + cMessage[port-1][8+shift];
-			StreamRawToPort(cMessage[port-1][shift], cMessage[port-1][9+shift], cMessage[port-1][10+shift], period, timeout);
-			H26R0_Weight2=Average(cMessage[port-1][shift],1);	
+			period =((uint32_t )cMessage[port - 1][6 + shift] << 24) + ((uint32_t )cMessage[port - 1][5 + shift] << 16) + ((uint32_t )cMessage[port - 1][4 + shift] << 8) + cMessage[port - 1][3 + shift];
+			timeout = ((uint32_t) cMessage[port - 1][10 + shift] << 24) + ((uint32_t) cMessage[port - 1][9 + shift] << 16) + ((uint32_t) cMessage[port - 1][8 + shift] << 8) + cMessage[port - 1][7 + shift];
+			H26R0_Weight2=Average(cMessage[port-1][shift],1);
+			StreamRawToPort(cMessage[port - 1][shift],cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift], period, timeout);
 			break;
 			
 		case (CODE_H26R0_SAMPLE_RAW):
 			H26R0_Weight2=Average(cMessage[port-1][shift],1);	
+			SendResults(DATA_To_SEND,SAMPLE_PORT_CASE,Gram,cMessage[port - 1][1 + shift],cMessage[port - 1][2 + shift],NULL);
 			break;
 		
 		case (CODE_H26R0_STREAM_FORMAT):
@@ -549,6 +560,7 @@ void RegisterModuleCLICommands(void)
 	
 }
 
+
 /*-----------------------------------------------------------*/
 
 /* --- Get the port for a given UART. 
@@ -573,41 +585,37 @@ uint8_t GetPort(UART_HandleTypeDef *huart)
 //read value from HX711
 float readHX711(void)
 {
-	uint8_t j=0;
-	//wait until HX711 becomes ready
-	while(HAL_GPIO_ReadPin(GPIOA,DOUT)==1){	}
+	uint8_t j =0;
+//wait until HX711 becomes ready
+	while(HAL_GPIO_ReadPin(GPIOA,DOUT) == 1) {
+	}
 	
 	portENTER_CRITICAL();
-		for (j=0; j<pulses; j++)
-		{
-			HAL_GPIO_WritePin(GPIOA,PD_SCK, GPIO_PIN_SET);
-			Delay_us(1);
+	for(j =0; j < pulses; j++) {
+		HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_SET);
+		Delay_us(1);
 
-			if(j<24)
-			{
-				Current_pin_state=HAL_GPIO_ReadPin(GPIOA,DOUT);
-				Data|=Current_pin_state; 
-				if(j<23)			
-					Data = Data<<1;				
-			}
-							
-			HAL_GPIO_WritePin(GPIOA,PD_SCK, GPIO_PIN_RESET);
-			Delay_us(1);
+		if(j < 24) {
+			Current_pin_state =HAL_GPIO_ReadPin(GPIOA,DOUT);
+			Data |=Current_pin_state;
+			if(j < 23) Data =Data << 1;
 		}
-		value=Data;
-		Data=0;
-	portEXIT_CRITICAL();
-		
-	//check if the Twosvalue is positive or negative
-	if(value>ADC_full_range)
-	{
-		value=(~value&0x00FFFFFF);
-		value+=1;        // the output of the ADC
-		valuef=-(float)value;
+
+		HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
+		Delay_us(1);
 	}
-	else
-	{
-		valuef=(float)value;
+	value =Data;
+	Data =0;
+	portEXIT_CRITICAL();
+
+//check if the Twosvalue is positive or negative
+	if(value > ADC_full_range) {
+		value = (~value & 0x00FFFFFF);
+		value +=1;// the output of the ADC
+		valuef =-(float) value;
+	}
+	else {
+		valuef =(float) value;
 	}
 	return (valuef);		
 }
@@ -618,9 +626,9 @@ float readHX711(void)
 */
 float weightCalculation(void)
 {
-	rawvalue=(valuef*0.5*AVDD)/(ADC_full_range*gain) + cell_drift - IC_drift - Zero_Drift;  //+0.000022;
-	weight=(rawvalue*full_scale)/calibration_factor;
-	return(weight);	
+	rawvalue = (valuef * 0.5 * AVDD) / (ADC_full_range * gain) + cell_drift - IC_drift - Zero_Drift;//+0.000022;
+	weight = (rawvalue * full_scale) / calibration_factor;
+	return (weight);
 }
  
 /*-----------------------------------------------------------*/
@@ -654,6 +662,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 		default:
 			Raw_Msg=message; break;
 	}
+	weightSample=Raw_Msg;
 
   /* Get CLI output buffer */
   pcOutputString = FreeRTOS_CLIGetOutputBuffer();
@@ -741,7 +750,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 				}
 				else{
 						messageParams[0] = Port;
-					  messageParams[1] = *((__IO uint8_t *)(&RawMsgInt)+3);
+						messageParams[1] = *((__IO uint8_t *)(&RawMsgInt)+3);
 						messageParams[2] = *((__IO uint8_t *)(&RawMsgInt)+2);
 						messageParams[3] = *((__IO uint8_t *)(&RawMsgInt)+1);
 						messageParams[4] = *((__IO uint8_t *)(&RawMsgInt)+0);
@@ -760,7 +769,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
 				}
 				else{
 						messageParams[0] = Port;
-					  messageParams[1] = *((__IO uint8_t *)(&Raw_Msg)+3);
+						messageParams[1] = *((__IO uint8_t *)(&Raw_Msg)+3);
 						messageParams[2] = *((__IO uint8_t *)(&Raw_Msg)+2);
 						messageParams[3] = *((__IO uint8_t *)(&Raw_Msg)+1);
 						messageParams[4] = *((__IO uint8_t *)(&Raw_Msg)+0);
@@ -771,7 +780,7 @@ int SendResults(float message, uint8_t Mode, uint8_t Unit, uint8_t Port, uint8_t
       break;
 		
     case SAMPLE_BUFFER_CASE:
-		case STREAM_BUFFER_CASE:
+	case STREAM_BUFFER_CASE:
       memset(Buffer, 0, sizeof(float));
       memcpy(Buffer, &Raw_Msg, sizeof(float));
       break;
@@ -896,7 +905,7 @@ void SetHX711Gain(uint8_t ch)
 	switch(ch)
 	{
 		case(1): pulses=25;	gain=128; break;  //Chanel A, Gain factor 128
-		case(2): pulses=27; gain=32;	break;  //Chanel B, Gain factor 32
+		case(2): pulses=27; gain=32;  break;  //Chanel B, Gain factor 32
 		default: pulses=25;
 	}
 }

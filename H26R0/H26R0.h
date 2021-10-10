@@ -1,10 +1,10 @@
 /*
-    BitzOS (BOS)V0.2.4 - Copyright (C) 2017-2021 Hexabitz
+    BitzOS (BOS)V0.2.5 - Copyright (C) 2017-2021 Hexabitz
     All rights reserved
 		
     File Name     : H26R0.h
     Description   : Header file for module H26R0.
-										Load cell (strain gauge) Whatstone bridge sensor (HX711)
+					Load cell (strain gauge) Whatstone bridge sensor (HX711)
 */
 	
 /* Define to prevent recursive inclusion -------------------------------------*/

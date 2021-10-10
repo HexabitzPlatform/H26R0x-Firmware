@@ -1,3 +1,0 @@
-BOS_msgparser.c:952:6:BackEndTask	72	static
-BOS_msgparser.c:1119:19:User_MessagingParser	0	static
-BOS_msgparser.c:102:6:PxMessagingTask	128	static,ignoring_inline_asm
