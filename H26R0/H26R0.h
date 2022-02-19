@@ -1,5 +1,5 @@
 /*
-    BitzOS (BOS)V0.2.5 - Copyright (C) 2017-2021 Hexabitz
+    BitzOS (BOS)V0.2.6 - Copyright (C) 2017-2022 Hexabitz
     All rights reserved
 		
     File Name     : H26R0.h
@@ -17,7 +17,8 @@
 #include "H26R0_uart.h"	
 #include "H26R0_gpio.h"	
 #include "H26R0_dma.h"	
-	
+#include "H26R0_inputs.h"
+#include "H26R0_eeprom.h"
 	
 /* Exported definitions -------------------------------------------------------*/
 
@@ -155,6 +156,8 @@ int ZeroCal(uint8_t Ch);
 int Stop(void);
 int PowerDown(void);
 int PowerOn(void);
+void SetupPortForRemoteBootloaderUpdate(uint8_t port);
+void remoteBootloaderUpdate(uint8_t src,uint8_t dst,uint8_t inport,uint8_t outport);
 
 /* -----------------------------------------------------------------------
 	|															Commands																 	|
