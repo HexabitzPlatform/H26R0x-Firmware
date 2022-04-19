@@ -18,7 +18,7 @@ extern uint8_t UARTRxBufIndex[NumOfPorts];
 
 /* External function prototypes ----------------------------------------------*/
 
-
+extern TaskHandle_t xCommandConsoleTaskHandle; // CLI Task handler.
 
 
 /******************************************************************************/
