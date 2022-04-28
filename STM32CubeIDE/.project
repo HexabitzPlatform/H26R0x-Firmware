@@ -92,24 +92,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/BOS/BOS_dma.h</locationURI>
 		</link>
 		<link>
-			<name>BOS/BOS_eeprom.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/BOS/BOS_eeprom.c</locationURI>
-		</link>
-		<link>
-			<name>BOS/BOS_eeprom.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/BOS/BOS_eeprom.h</locationURI>
-		</link>
-		<link>
 			<name>BOS/BOS_freertos.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/BOS/BOS_freertos.c</locationURI>
-		</link>
-		<link>
-			<name>BOS/BOS_inputs.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/BOS/BOS_inputs.c</locationURI>
 		</link>
 		<link>
 			<name>BOS/BOS_messaging.c</name>
