@@ -652,6 +652,7 @@ float readHX711(void)
 {
 	uint8_t j =0;
 //wait until HX711 becomes ready
+	Delay_us(1);
 	while(HAL_GPIO_ReadPin(GPIOA,DOUT) == 1) {
 	}
 	
@@ -1006,7 +1007,7 @@ float SampleGram(uint8_t ch)
 	uint8_t i=0;
 	SetHX711Gain(ch);
 	PowerOn();
-	for(i=0; i<2; i++) 		readHX711();
+	readHX711();
 	weightGram=weightCalculation()*Kg2Gram_ratio;
 	return(weightGram);
 }
