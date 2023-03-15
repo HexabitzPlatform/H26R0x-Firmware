@@ -1,5 +1,5 @@
 /*
-    BitzOS (BOS)V0.2.7 - Copyright (C) 2017-2022 Hexabitz
+    BitzOS (BOS)V0.2.9 - Copyright (C) 2017-2023 Hexabitz
     All rights reserved
 
     File Name     : H26R0.c
@@ -652,6 +652,7 @@ float readHX711(void)
 {
 	uint8_t j =0;
 //wait until HX711 becomes ready
+	Delay_us(1);
 	while(HAL_GPIO_ReadPin(GPIOA,DOUT) == 1) {
 	}
 	
@@ -1006,7 +1007,7 @@ float SampleGram(uint8_t ch)
 	uint8_t i=0;
 	SetHX711Gain(ch);
 	PowerOn();
-	for(i=0; i<2; i++) 		readHX711();
+	readHX711();
 	weightGram=weightCalculation()*Kg2Gram_ratio;
 	return(weightGram);
 }
