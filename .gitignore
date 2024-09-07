@@ -1,4 +1,8 @@
-*.d
 *.o
+*.d
 *.su
-*.mk
+*.Admin
+*.dbgconf
+*.asaad
+*.uvoptx
+*.cyclo
