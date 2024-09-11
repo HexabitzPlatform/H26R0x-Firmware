@@ -32,7 +32,7 @@
 
 
 /* Port-related definitions */
-#define	NumOfPorts			6
+#define	NumOfPorts			5
 
 #define P_PROG 				P2						/* ST factory bootloader UART */
 
@@ -42,10 +42,10 @@
 #define _P3
 #define _P4
 #define _P5
-#define _P6
+//#define _P6
 
 /* Define available USARTs */
-#define _Usart1 1
+//#define _Usart1 1
 #define _Usart2 1
 #define _Usart3 1
 #define _Usart4	1
@@ -53,19 +53,19 @@
 #define _Usart6	1
 
 /* Port-UART mapping */
-#define P1uart &huart5
+#define P1uart &huart4
 #define P2uart &huart2
 #define P3uart &huart6
 #define P4uart &huart3
-#define P5uart &huart1
-#define P6uart &huart1
+#define P5uart &huart5
+//#define P6uart &huart1
 
 /* Port Definitions */
-#define	USART1_TX_PIN		GPIO_PIN_9
-#define	USART1_RX_PIN		GPIO_PIN_10
-#define	USART1_TX_PORT		GPIOA
-#define	USART1_RX_PORT		GPIOA
-#define	USART1_AF			GPIO_AF1_USART1
+//#define	USART1_TX_PIN		GPIO_PIN_9
+//#define	USART1_RX_PIN		GPIO_PIN_10
+//#define	USART1_TX_PORT		GPIOA
+//#define	USART1_RX_PORT		GPIOA
+//#define	USART1_AF			GPIO_AF1_USART1
 
 #define	USART2_TX_PIN		GPIO_PIN_2
 #define	USART2_RX_PIN		GPIO_PIN_3
@@ -97,11 +97,19 @@
 #define	USART6_RX_PORT		GPIOA
 #define	USART6_AF			GPIO_AF3_USART6
 
-/* Module-specific Definitions */
 
+#define STOP_MEASUREMENT_RANGING      0
+#define START_MEASUREMENT_RANGING     1
+
+
+/* Module-specific Definitions */
+#define RATE            GPIO_PIN_5 // GPIOB
+#define DOUT            GPIO_PIN_4
+#define SCK             GPIO_PIN_3
+#define TIMERID_TIMEOUT_MEASUREMENT   0xFF
 /* Indicator LED */
 #define _IND_LED_PORT		 GPIOB
-#define _IND_LED_PIN		 GPIO_PIN_15
+#define _IND_LED_PIN		 GPIO_PIN_2
 
 #define NUM_MODULE_PARAMS	 1
 
@@ -122,8 +130,14 @@
 
 /* Module EEPROM Variables */
 // Module Addressing Space 500 - 599
-#define _EE_MODULE			500
-
+//#define _EE_MODULE			500
+#define _EE_cell_full_scale		500
+#define _EE_cell_drift_LSB		501
+#define _EE_cell_drift_MSB		502
+#define _EE_cell_output_LSB		503
+#define _EE_cell_output_MSB		504
+#define _EE_zero_drift_LSB		505
+#define _EE_zero_drift_MSB		506
 /* Exported types ------------------------------------------------------------*/
 
 
@@ -138,7 +152,7 @@ typedef enum {
 
 
 /* Export UART variables */
-extern UART_HandleTypeDef huart1;
+//extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 extern UART_HandleTypeDef huart4;
@@ -146,7 +160,7 @@ extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart6;
 
 /* Define UART Init prototypes */
-extern void MX_USART1_UART_Init(void);
+//extern void MX_USART1_UART_Init(void);
 extern void MX_USART2_UART_Init(void);
 extern void MX_USART3_UART_Init(void);
 extern void MX_USART4_UART_Init(void);
@@ -163,6 +177,18 @@ extern void ExecuteMonitor(void);
  */
 
 
+void SetHX711Rate(uint8_t Data_Rate);
+float Calibration(uint16_t Full_Scale, float Cell_Output, float Cell_Drift);
+float SampleGram(uint8_t ch);
+float SampleKGram(uint8_t ch);
+float SampleOunce(uint8_t ch);
+float SamplePound(uint8_t ch);
+
+float Average(uint8_t ch, uint8_t samples);
+int ZeroCal(uint8_t Ch);
+int Stop(void);
+int PowerDown(void);
+int PowerOn(void);
 void SetupPortForRemoteBootloaderUpdate(uint8_t port);
 void remoteBootloaderUpdate(uint8_t src,uint8_t dst,uint8_t inport,uint8_t outport);
 
