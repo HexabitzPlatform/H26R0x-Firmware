@@ -177,7 +177,7 @@ extern void ExecuteMonitor(void);
  */
 
 
-void SetHX711Rate(uint8_t Data_Rate);
+//void SetHX711Rate(uint8_t Data_Rate);
 float Calibration(uint16_t Full_Scale, float Cell_Output, float Cell_Drift);
 float SampleGram(uint8_t ch);
 float SampleKGram(uint8_t ch);
