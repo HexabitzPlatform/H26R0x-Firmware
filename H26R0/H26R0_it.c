@@ -78,18 +78,6 @@ void EXTI0_1_IRQHandler(void)
 /**
  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
  */
-void USART1_IRQHandler(void){
-	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-	
-#if defined (_Usart1)		
-	HAL_UART_IRQHandler(&huart1);
-#endif
-	
-	/* If lHigherPriorityTaskWoken is now equal to pdTRUE, then a context
-	 switch should be performed before the interrupt exists.  That ensures the
-	 unblocked (higher priority) task is returned to immediately. */
-	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-}
 
 /*-----------------------------------------------------------*/
 
@@ -247,7 +235,7 @@ void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart) {
 
 	WakeupFromStopFlag = 1;
 
-	if (huart->Instance == USART1)
+	if (huart->Instance == USART4)
 		HAL_UARTEx_DisableStopMode(huart);
 
 	if (huart->Instance == USART2)
