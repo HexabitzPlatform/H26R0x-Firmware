@@ -503,9 +503,7 @@ void Module_Peripheral_Init(void){
 	MX_USART6_UART_Init();
 	MX_GPIO_Init();
 	/* HX711 */
-	 MX_GPIO_Init();// GPIO init
-
-		/* Creat load cell task */
+	/* Creat load cell task */
 		xTaskCreate(LoadcellTask,(const char* ) "LoadcellTask",(2*configMINIMAL_STACK_SIZE),NULL,osPriorityNormal - osPriorityIdle,&LoadcellHandle);
 
 		/* load saved var*/
