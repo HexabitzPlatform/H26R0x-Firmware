@@ -45,7 +45,7 @@
 //#define _P6
 
 /* Define available USARTs */
-//#define _Usart1 1
+
 #define _Usart2 1
 #define _Usart3 1
 #define _Usart4	1
@@ -96,24 +96,24 @@
 #define	USART6_TX_PORT		GPIOA
 #define	USART6_RX_PORT		GPIOA
 #define	USART6_AF			GPIO_AF3_USART6
-
-
 #define STOP_MEASUREMENT_RANGING      0
 #define START_MEASUREMENT_RANGING     1
-
-
 /* Module-specific Definitions */
-#define RATE            GPIO_PIN_5 // GPIOB
+
+#define RATE_pin            GPIO_PIN_5 // GPIOB
 #define DOUT            GPIO_PIN_4
-#define SCK             GPIO_PIN_3
+#define PD_SCK             GPIO_PIN_3
 #define TIMERID_TIMEOUT_MEASUREMENT   0xFF
+
+
 /* Indicator LED */
 #define _IND_LED_PORT		 GPIOB
 #define _IND_LED_PIN		 GPIO_PIN_2
 
-#define NUM_MODULE_PARAMS	 1
+//#define NUM_MODULE_PARAMS	 1
 
 /* Module GPIO Pinout */
+
 
 
 /* Module Special I2C */
@@ -129,8 +129,7 @@
 #define DEFAULT                 4
 
 /* Module EEPROM Variables */
-// Module Addressing Space 500 - 599
-//#define _EE_MODULE			500
+
 #define _EE_cell_full_scale		500
 #define _EE_cell_drift_LSB		501
 #define _EE_cell_drift_MSB		502
@@ -138,14 +137,24 @@
 #define _EE_cell_output_MSB		504
 #define _EE_zero_drift_LSB		505
 #define _EE_zero_drift_MSB		506
+
+
+// Module Addressing Space 500 - 599
+//#define _EE_MODULE			500
+
 /* Exported types ------------------------------------------------------------*/
 
 
 /* Module_Status Type Definition */
-typedef enum {
-	H26R0_OK =0,
-	H26R0_ERR_WrongMode,
-	H26R0_ERROR =255
+#define NUM_MODULE_PARAMS		3
+
+/* H26R0_Status Type Definition */
+typedef enum
+{
+  H26R0_OK = 0,
+	H26R0_ERR_UnknownMessage = 1,
+	H26R0_ERR_WrongParams,
+	H26R0_ERROR = 255
 } Module_Status;
 
 /* Export Module typedef structure */
@@ -176,8 +185,7 @@ extern void ExecuteMonitor(void);
 /* -----------------------------------------------------------------------
  */
 
-
-//void SetHX711Rate(uint8_t Data_Rate);
+void SetHX711Rate(uint8_t Data_Rate);
 float Calibration(uint16_t Full_Scale, float Cell_Output, float Cell_Drift);
 float SampleGram(uint8_t ch);
 float SampleKGram(uint8_t ch);
@@ -189,6 +197,7 @@ int ZeroCal(uint8_t Ch);
 int Stop(void);
 int PowerDown(void);
 int PowerOn(void);
+
 void SetupPortForRemoteBootloaderUpdate(uint8_t port);
 void remoteBootloaderUpdate(uint8_t src,uint8_t dst,uint8_t inport,uint8_t outport);
 
