@@ -41,6 +41,21 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
 }
+
+void HX711_GPIO_Init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_3;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed =  GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	GPIO_InitStruct.Pin = GPIO_PIN_4;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
 //-- Configure indicator LED
 void IND_LED_Init(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -114,16 +129,16 @@ BOS_Status GetPortGPIOs(uint8_t port,uint32_t *TX_Port,uint16_t *TX_Pin,uint32_t
 	/* Get port UART */
 	UART_HandleTypeDef *huart =GetUart(port);
 	
-	if(huart == &huart1){
+	/*	if(huart == &huart1){
 #ifdef _Usart1		
 		*TX_Port =(uint32_t ) USART1_TX_PORT;
 		*TX_Pin = USART1_TX_PIN;
 		*RX_Port =(uint32_t ) USART1_RX_PORT;
 		*RX_Pin = USART1_RX_PIN;
 #endif
-	}
+	}*/
 #ifdef _Usart2	
-	else if(huart == &huart2){
+	 if(huart == &huart2){
 		*TX_Port =(uint32_t ) USART2_TX_PORT;
 		*TX_Pin = USART2_TX_PIN;
 		*RX_Port =(uint32_t ) USART2_RX_PORT;
