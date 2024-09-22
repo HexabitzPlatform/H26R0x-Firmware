@@ -1035,14 +1035,14 @@ static void HandleTimeout(TimerHandle_t xTimer)
 void SetHX711Rate(uint8_t Data_Rate)
 {
 	//make PD_SCK pin zero
-	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB,PD_SCK,GPIO_PIN_RESET);
 	//determine IC rate
 	rate=Data_Rate;
 	switch(rate)
 	{
-		case(10): HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_RESET); break;
-		case(80): HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_SET); break;
-		default: HAL_GPIO_WritePin(GPIOA,RATE_pin,GPIO_PIN_RESET);
+		case(10): HAL_GPIO_WritePin(GPIOB,RATE_pin,GPIO_PIN_RESET); break;
+		case(80): HAL_GPIO_WritePin(GPIOB,RATE_pin,GPIO_PIN_SET); break;
+		default: HAL_GPIO_WritePin(GPIOB,RATE_pin,GPIO_PIN_RESET);
 	}
 }
 
@@ -1275,7 +1275,7 @@ int Stop(void)
 int PowerDown(void)
 {
 	//make PD_SCK pin high
-	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB,PD_SCK,GPIO_PIN_SET);
 
 	return (H26R0_OK);
 }
@@ -1287,7 +1287,7 @@ int PowerDown(void)
 int PowerOn(void)
 {
 	//make PD_SCK pin high
-	HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB,PD_SCK,GPIO_PIN_RESET);
 
 	return (H26R0_OK);
 }
