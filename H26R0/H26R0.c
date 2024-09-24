@@ -729,21 +729,21 @@ float readHX711(void)
 	uint8_t j =0;
 //wait until HX711 becomes ready
 	Delay_us(1);
-	while(HAL_GPIO_ReadPin(GPIOA,DOUT) == 1) {
+	while(HAL_GPIO_ReadPin(GPIOB,DOUT) == 1) {
 	}
 
 	portENTER_CRITICAL();
 	for(j =0; j < pulses; j++) {
-		HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOB,PD_SCK,GPIO_PIN_SET);
 		Delay_us(1);
 
 		if(j < 24) {
-			Current_pin_state =HAL_GPIO_ReadPin(GPIOA,DOUT);
+			Current_pin_state =HAL_GPIO_ReadPin(GPIOB,DOUT);
 			Data |=Current_pin_state;
 			if(j < 23) Data =Data << 1;
 		}
 
-		HAL_GPIO_WritePin(GPIOA,PD_SCK,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOB,PD_SCK,GPIO_PIN_RESET);
 		Delay_us(1);
 	}
 	value =Data;
